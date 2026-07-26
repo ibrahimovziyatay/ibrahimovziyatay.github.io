@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenobi Write-up — Ziyatay İbrahimzadə</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0E14;
+    --panel: #10161F;
+    --panel-2: #141B26;
+    --line: #232C3A;
+    --text: #E4E9F0;
+    --muted: #7C8A9E;
+    --accent: #E8A33D;
+    --ok: #4FD1A5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.7;}
+  h1,h2,h3,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  ::selection{background:var(--accent); color:#0A0E14;}
+  .wrap{max-width:800px; margin:0 auto; padding:0 24px;}
+
+  nav{position:sticky; top:0; z-index:50; background:rgba(10,14,20,0.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex; justify-content:space-between; align-items:center; height:64px;}
+  .logo{font-family:'JetBrains Mono',monospace; font-weight:700;}
+  .logo span{color:var(--accent);}
+  .back{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--muted);}
+  .back:hover{color:var(--text);}
+
+  header.hd{padding:64px 0 40px; border-bottom:1px solid var(--line);}
+  .badges{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+  .badge{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--muted); border:1px solid var(--line); padding:4px 10px; border-radius:4px;}
+  .badge.diff{color:var(--ok); border-color:var(--ok);}
+  h1{font-size:clamp(28px,4vw,40px); margin-bottom:14px;}
+  .meta{color:var(--muted); font-size:14.5px;}
+
+  article{padding:48px 0 80px;}
+  article h2{
+    font-size:20px; color:var(--accent); margin:44px 0 16px;
+    padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  article h2:first-child{margin-top:0;}
+  article p{color:#C7D0DC; margin-bottom:16px; font-size:15.5px;}
+  article strong{color:var(--text); font-weight:600;}
+  article code{
+    font-family:'JetBrains Mono',monospace; background:var(--panel-2);
+    padding:2px 6px; border-radius:4px; font-size:13.5px; color:var(--accent);
+  }
+  pre{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px;
+    padding:18px 20px; overflow-x:auto; margin:18px 0;
+  }
+  pre code{background:none; padding:0; color:var(--ok); font-size:13.5px; line-height:1.6;}
+  .note{
+    background:var(--panel); border-left:3px solid var(--accent);
+    border-radius:6px; padding:16px 20px; margin:20px 0;
+    color:var(--muted); font-size:14.5px;
+  }
+  .note strong{color:var(--accent);}
+  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14.5px;}
+  th,td{text-align:left; padding:10px 14px; border:1px solid var(--line);}
+  th{background:var(--panel); font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent);}
+  .footline{color:var(--muted); font-size:13px; font-style:italic; margin-top:40px; padding-top:24px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">ziyatay<span>@</span>portfolio</div>
+    <a class="back" href="../index.html#projects">← geri</a>
+  </div>
+</nav>
+
+<header class="hd">
+  <div class="wrap">
+    <div class="badges">
+      <span class="badge diff">Easy</span>
+      <span class="badge">SMB</span>
+      <span class="badge">FTP</span>
+      <span class="badge">NFS</span>
+      <span class="badge">Privilege Escalation</span>
+    </div>
+    <h1>TryHackMe — Kenobi Write-up</h1>
+    <p class="meta">SMB/NFS enumerasiyası, ProFTPD SITE COPY zəifliyi və SUID/PATH hijacking ilə root əldə etmək</p>
+  </div>
+</header>
+
+<article>
+  <div class="wrap">
+
+    <h2>1. Giriş</h2>
+    <p>Kenobi otağı, bir neçə fərqli servisin (SMB, FTP, NFS, SSH) bir araya gətirilməsi ilə real həyatda rast gəlinə biləcək bir "misconfiguration chain" (səhv konfiqurasiyaların zənciri) nümayiş etdirir. Məqsəd: ilkin girişi (initial access) əldə etmək və sonra root səviyyəsinə qədər hüquq yüksəltmək (privilege escalation).</p>
+
+    <h2>2. Reconnaissance (Nmap Scan)</h2>
+    <p>İlk addım olaraq hədəf sistemdə hansı portların açıq olduğunu görmək üçün Nmap skanı işlədildi:</p>
+    <pre><code>nmap -sV -sC -p- &lt;target-ip&gt;</code></pre>
+    <p>Nəticədə <strong>7 açıq port</strong> aşkarlandı. Bunların arasında diqqəti çəkən əsas servislər:</p>
+    <table>
+      <tr><th>Port</th><th>Servis</th><th>Qeyd</th></tr>
+      <tr><td>21</td><td>FTP</td><td>ProFTPD</td></tr>
+      <tr><td>22</td><td>SSH</td><td>Key-based giriş dəstəklənir</td></tr>
+      <tr><td>111</td><td>NFS/rpcbind</td><td><code>/var</code> mount edilə bilir</td></tr>
+      <tr><td>139/445</td><td>SMB</td><td>Paylaşımlar mövcuddur</td></tr>
+    </table>
+    <div class="note"><strong>Termin izahı:</strong> <code>-sC</code> bayrağı Nmap-ın standart NSE (Nmap Scripting Engine) skriptlərini işə salır, <code>-sV</code> isə servislərin versiyasını müəyyən edir. Bu skriptlər avtomatik olaraq SMB paylaşımları, NFS export-ları kimi əlavə məlumatları da çıxara bilir.</div>
+
+    <h2>3. SMB Enumerasiyası</h2>
+    <p>Nmap-ın NSE skriptləri (<code>smb-enum-shares</code>, <code>smb-enum-users</code> kimi) vasitəsilə SMB üzərində istifadəçilər və paylaşımlar araşdırıldı.</p>
+    <p><strong>Nəticə:</strong> 3 paylaşım (share) tapıldı, onlardan biri <strong>anonymous</strong> girişə açıq idi.</p>
+    <pre><code>smbclient //&lt;target-ip&gt;/anonymous</code></pre>
+    <p>Paylaşım daxilində <code>log.txt</code> adlı fayl aşkarlandı və yerli maşına köçürüldü:</p>
+    <pre><code>get log.txt</code></pre>
+    <div class="note"><strong>Anonymous SMB share:</strong> SMB servisinin autentifikasiya tələb etmədən istənilən istifadəçiyə giriş icazəsi verməsi deməkdir. Real mühitdə bu, ciddi konfiqurasiya səhvi sayılır — həssas fayllar heç bir icazə olmadan əldə edilə bilər.</div>
+
+    <h2>4. FTP və NFS Enumerasiyası</h2>
+    <p><strong>FTP (port 21):</strong> ProFTPD servisi işlədiyi aşkarlandı — sonrakı exploitasiya üçün açar rol oynayacaqdı.</p>
+    <p><strong>NFS (port 111):</strong> NFS export-ları yoxlanıldı və <code>/var</code> qovluğunun mount edilə bilən olduğu müəyyən edildi.</p>
+    <pre><code>showmount -e &lt;target-ip&gt;</code></pre>
+    <div class="note"><strong>NFS export:</strong> NFS uzaq bir sistemin fayl sistemini şəbəkə üzərindən "mount" etməyə imkan verir. Əgər <code>/var</code> kimi həssas qovluq düzgün icazələr olmadan export edilibsə, uzaqdan fayllara giriş yaranır — məhz bu otaqda istismar olunan zəiflik budur.</div>
+
+    <h2>5. ProFTPD Exploit Axtarışı</h2>
+    <p>ProFTPD versiyasına uyğun məlum zəifliklər <code>searchsploit</code> ilə araşdırıldı:</p>
+    <pre><code>searchsploit proftpd</code></pre>
+    <p><strong>Nəticə:</strong> 4 potensial exploit tapıldı. Diqqət çəkəni <strong>SITE CPFR</strong> və <strong>SITE CPTO</strong> əmrləri ilə bağlı zəiflik idi — bu əmrlər server üzərində fayl kopyalamağa imkan verir.</p>
+    <div class="note"><strong>SITE CPFR / SITE CPTO:</strong> ProFTPD-nin <code>mod_copy</code> modulunun əmrləridir. <code>SITE CPFR &lt;mənbə&gt;</code> faylın haradan, <code>SITE CPTO &lt;hədəf&gt;</code> isə haraya kopyalanacağını bildirir. Zəiflik ondadır ki, bu əmrlər autentifikasiyasız istifadəçilərə də fayl kopyalamağa imkan verir.</div>
+
+    <h2>6. Zəifliklərin Zəncirlənməsi — İlkin Giriş</h2>
+    <p>Üç ayrı tapıntı bir-birinə bağlandı: (1) SSH-in key-based girişi dəstəklədiyi, (2) FTP-dəki SITE CPFR/CPTO zəifliyi, (3) NFS vasitəsilə <code>/var</code>-ın mount edilə bilməsi.</p>
+    <p>FTP-yə qoşulub, <code>id_rsa</code> faylını <code>/var/tmp</code> qovluğuna kopyalamaq:</p>
+    <pre><code>ftp &lt;target-ip&gt;
+SITE CPFR /home/kenobi/.ssh/id_rsa
+SITE CPTO /var/tmp/id_rsa</code></pre>
+    <p>Öz sistemimizdə mount nöqtəsi yaradılıb, <code>/var</code> bağlanıldı:</p>
+    <pre><code>mkdir /mnt/kenobiNFS
+mount &lt;target-ip&gt;:/var /mnt/kenobiNFS
+ls -la /mnt/kenobiNFS</code></pre>
+    <p>Bu əməliyyatdan sonra <code>id_rsa</code> faylı artıq yerli <code>/mnt/kenobiNFS</code> qovluğunda görünürdü. SSH ilə giriş:</p>
+    <pre><code>chmod 600 id_rsa
+ssh -i id_rsa kenobi@&lt;target-ip&gt;</code></pre>
+    <p>Nəticədə <strong>kenobi</strong> istifadəçisi kimi ilkin giriş əldə edildi.</p>
+    <div class="note"><strong>Zəncirin əhəmiyyəti:</strong> Heç bir tək zəiflik başlı-başına kifayət etmirdi. SSH key-in mövcudluğunu bilmək, onu FTP vasitəsilə köçürmək və NFS vasitəsilə "oğurlamaq" bacarığı ilə birləşdi — real pentesting-də tez-tez rast gəlinən <strong>zəifliklərin zəncirlənməsi</strong> prinsipi.</div>
+
+    <h2>7. Privilege Escalation</h2>
+    <p>SUID bitinə malik fayllar axtarıldı:</p>
+    <pre><code>find / -perm -u=s -type f 2>/dev/null</code></pre>
+    <div class="note"><strong>SUID bit:</strong> Bir icra faylına təyin edildikdə, fayl işə düşdüyü zaman onu işə salan istifadəçidən asılı olmayaraq, <strong>faylın sahibinin</strong> hüquqları ilə icra olunur. Düzgün yazılmayıbsa, hüquq yüksəltmək üçün istifadə oluna bilər.</div>
+    <p>Axtarışda qeyri-standart SUID fayl aşkarlandı: <code>/usr/bin/menu</code>. İcra edildikdə arxa planda avtomatik olaraq başqa proqramları (məsələn <code>curl</code>) çağırdığı müşahidə olundu.</p>
+    <p><strong>İstismar üsulu — PATH Hijacking:</strong> <code>menu</code> proqramı <code>curl</code> əmrini tam yol göstərmədən çağırdığı üçün, saxta <code>curl</code> faylı yaradıldı:</p>
+    <pre><code>echo "/bin/sh" > curl
+chmod 777 curl
+export PATH=/tmp:$PATH</code></pre>
+    <p><code>/usr/bin/menu</code> yenidən icra edildiyində, öz saxta <code>curl</code> faylımız (<code>/bin/sh</code>) işə düşdü. <code>menu</code> proqramı root hüquqları ilə işlədiyi üçün, açılan shell də <strong>root səviyyəsində</strong> oldu.</p>
+    <div class="note"><strong>PATH Hijacking:</strong> Bir proqramın çağırdığı əmrin tam sistem yolunu deyil, sadəcə adını istifadə etməsindən yaranan zəiflikdir. Hücumçu öz <code>$PATH</code> mühit dəyişənini manipulyasiya edərək, sistemin əsl proqramı yerinə özününkünü işə saldıra bilər. SUID fayllarda xüsusilə təhlükəlidir.</div>
+
+    <h2>8. Nəticə və Öyrənilənlər</h2>
+    <p><strong>Enumerasiyanın vacibliyi:</strong> Hər açıq portu ayrı-ayrılıqda araşdırmaq, sonda onların birlikdə necə istismar oluna biləcəyini göstərdi.</p>
+    <p><strong>Zəifliklərin zəncirlənməsi:</strong> Tək bir zəiflik kifayət etmədi — üç fərqli tapıntı birləşərək ilkin girişi mümkün etdi.</p>
+    <p><strong>SUID + PATH Hijacking:</strong> "Adi" görünən bir SUID proqramın belə, düzgün yazılmadıqda tam sistem kompromisinə səbəb ola biləcəyini nümayiş etdirdi.</p>
+    <p><strong>Əldə edilən flag-lar:</strong> User flag və Root flag.</p>
+
+    <p class="footline">Bu write-up TryHackMe-nin istifadə şərtlərinə uyğun, öz həllim əsasında hazırlanmışdır.</p>
+  </div>
+</article>
+
+</body>
+</html>
