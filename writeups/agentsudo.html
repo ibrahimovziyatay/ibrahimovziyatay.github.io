@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Sudo — TryHackMe Write-up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0d0a;
+    --bg-alt: #111410;
+    --panel: #151912;
+    --panel-line: #262b21;
+    --paper: #d9dccf;
+    --paper-dim: #8d9585;
+    --stamp-red: #b3382c;
+    --phosphor: #6fd66f;
+    --phosphor-dim: #3f7a45;
+    --amber: #e0a544;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top left, #141810 0%, var(--bg) 55%),
+      var(--bg);
+    color: var(--paper);
+    font-family: var(--sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--phosphor-dim); color: #06120a; }
+
+  a{ color: var(--phosphor); text-decoration: none; border-bottom: 1px solid var(--phosphor-dim); }
+  a:hover{ color: var(--amber); border-color: var(--amber); }
+
+  .wrap{ max-width: 840px; margin: 0 auto; padding: 0 24px 120px; }
+
+  /* ---------- HEADER / CASE STAMP ---------- */
+  header.case{
+    position: relative;
+    padding: 72px 0 40px;
+    border-bottom: 1px dashed var(--panel-line);
+    margin-bottom: 48px;
+  }
+  .case-id{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--paper-dim);
+    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .case-id::before{
+    content:"";
+    width: 8px; height: 8px;
+    background: var(--phosphor);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--phosphor);
+    flex-shrink:0;
+  }
+  h1.title{
+    font-family: var(--mono);
+    font-weight: 800;
+    font-size: clamp(32px, 6vw, 52px);
+    line-height: 1.08;
+    margin: 0 0 18px;
+    color: var(--paper);
+    letter-spacing: -0.01em;
+  }
+  h1.title .glow{ color: var(--phosphor); text-shadow: 0 0 22px rgba(111,214,111,0.35); }
+
+  .tagline{
+    font-size: 16px;
+    color: var(--paper-dim);
+    max-width: 60ch;
+    margin: 0 0 26px;
+  }
+
+  .stamp-row{ display:flex; flex-wrap:wrap; gap: 10px; align-items:center; }
+  .stamp{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: 1.5px solid var(--stamp-red);
+    color: var(--stamp-red);
+    padding: 5px 12px;
+    border-radius: 3px;
+    transform: rotate(-2deg);
+    opacity: 0.9;
+  }
+  .tool-chip{
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--paper-dim);
+    border: 1px solid var(--panel-line);
+    padding: 5px 10px;
+    border-radius: 3px;
+    background: var(--panel);
+  }
+
+  /* ---------- TOC ---------- */
+  nav.toc{
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 56px;
+  }
+  nav.toc .toc-label{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--phosphor-dim);
+    margin-bottom: 12px;
+  }
+  nav.toc ol{ margin:0; padding:0; list-style:none; columns: 2; column-gap: 24px;}
+  nav.toc li{ break-inside: avoid; margin-bottom: 8px; }
+  nav.toc a{ border-bottom: none; color: var(--paper); font-size: 14.5px; }
+  nav.toc a:hover{ color: var(--phosphor); }
+  nav.toc a .n{ color: var(--paper-dim); font-family: var(--mono); font-size: 12.5px; margin-right: 8px; }
+
+  /* ---------- SECTIONS ---------- */
+  section{ margin-bottom: 64px; scroll-margin-top: 24px; }
+
+  .section-head{
+    display:flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .section-num{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--bg);
+    background: var(--phosphor);
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 700;
+    flex-shrink:0;
+  }
+  h2{
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--paper);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  h3{
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--amber);
+    margin: 28px 0 12px;
+    font-weight: 500;
+  }
+  p{ margin: 0 0 16px; color: #c3c8b9; }
+  p code, li code{
+    font-family: var(--mono);
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    color: var(--amber);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.88em;
+  }
+  ul{ margin: 0 0 16px; padding-left: 0; list-style:none; }
+  ul li{
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 10px;
+    color: #c3c8b9;
+  }
+  ul li::before{
+    content: "›";
+    position: absolute;
+    left: 2px;
+    color: var(--phosphor);
+    font-weight: 700;
+  }
+
+  /* ---------- CODE / TERMINAL ---------- */
+  .term{
+    background: #080a07;
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    margin: 0 0 20px;
+    overflow: hidden;
+  }
+  .term-bar{
+    display:flex; gap:6px;
+    padding: 9px 12px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .term-bar span{ width:9px; height:9px; border-radius:50%; background:#3a3f34; }
+  .term pre{
+    margin:0;
+    padding: 16px 18px;
+    overflow-x:auto;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--phosphor);
+  }
+  .term pre .cmt{ color: var(--paper-dim); }
+
+  /* ---------- EVIDENCE / IMAGES ---------- */
+  figure.evidence{
+    margin: 22px 0 26px;
+    border: 1px solid var(--panel-line);
+    background: var(--panel);
+    border-radius: 6px;
+    padding: 10px;
+  }
+  figure.evidence img{
+    width: 100%;
+    display:block;
+    border-radius: 3px;
+    border: 1px solid #000;
+  }
+  figure.evidence figcaption{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--paper-dim);
+    padding: 10px 6px 2px;
+    display:flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  figure.evidence figcaption .tag{ color: var(--phosphor-dim); }
+
+  /* ---------- NOTE / CALLOUT ---------- */
+  .note{
+    border-left: 3px solid var(--amber);
+    background: rgba(224,165,68,0.06);
+    padding: 12px 16px;
+    margin: 0 0 20px;
+    font-size: 14.5px;
+    color: var(--paper-dim);
+  }
+  .note b{ color: var(--amber); }
+
+  /* ---------- FLAGS ---------- */
+  .flag{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--mono);
+    background: #06120a;
+    border: 1px solid var(--phosphor-dim);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+  }
+  .flag .label{ font-size: 11px; letter-spacing:0.14em; text-transform:uppercase; color: var(--phosphor); }
+  .flag .value{
+    color: #06120a;
+    background: repeating-linear-gradient(45deg, #1c1f19, #1c1f19 6px, #23271e 6px, #23271e 12px);
+    background: #171a13;
+    color: #171a13;
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    user-select: none;
+  }
+
+  /* ---------- TABLE / TOOLS GRID ---------- */
+  .tool-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    gap: 10px;
+  }
+  .tool-card{
+    border: 1px solid var(--panel-line);
+    background: var(--panel);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .tool-card .name{ font-family: var(--mono); color: var(--phosphor); font-size: 13.5px; display:block; margin-bottom: 4px; }
+  .tool-card .desc{ font-size: 13px; color: var(--paper-dim); }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top: 1px dashed var(--panel-line);
+    margin-top: 80px;
+    padding-top: 28px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--paper-dim);
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 640px){
+    nav.toc ol{ columns: 1; }
+    header.case{ padding-top: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="case">
+    <div class="case-id">CASE FILE // TRYHACKME // AGENT-SUDO</div>
+    <h1 class="title">Agent Sudo <span class="glow">— Write-up</span></h1>
+    <p class="tagline">Dəniz altında gizlədilmiş bir serverə daxil olmaq: enumeration, HTTP başlığı manipulyasiyası, brute-force, steqanoqrafiya və sudo-dakı bir CVE ilə root-a qədər.</p>
+    <div class="stamp-row">
+      <span class="stamp">Easy / Medium</span>
+      <span class="tool-chip">tryhackme.com/room/agentsudoctf</span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <div class="toc-label">Məzmun</div>
+    <ol>
+      <li><a href="#giris"><span class="n">00</span>Giriş</a></li>
+      <li><a href="#nmap"><span class="n">01</span>Enumeration — Nmap</a></li>
+      <li><a href="#web"><span class="n">02</span>Web / User-Agent</a></li>
+      <li><a href="#ftp"><span class="n">03</span>FTP Brute-Force</a></li>
+      <li><a href="#stego"><span class="n">04</span>Steqanoqrafiya</a></li>
+      <li><a href="#ssh"><span class="n">05</span>SSH ilə giriş</a></li>
+      <li><a href="#privesc"><span class="n">06</span>Privilege Escalation</a></li>
+      <li><a href="#flags"><span class="n">07</span>Flag-lar</a></li>
+      <li><a href="#lessons"><span class="n">08</span>Öyrənilənlər</a></li>
+      <li><a href="#tools"><span class="n">09</span>Alətlər</a></li>
+    </ol>
+  </nav>
+
+  <section id="giris">
+    <div class="section-head"><span class="section-num">00</span><h2>Giriş</h2></div>
+    <p>Bu yazı TryHackMe platformasındakı <b>Agent Sudo</b> otağının həllini addım-addım izah edir. Otaq dəniz altında yerləşən gizli bir server haqqındadır və məqsəd həmin serverə daxil olub, içindəki "həqiqəti" üzə çıxarmaqdır.</p>
+    <p>Otaq boyunca enumeration, HTTP başlığı manipulyasiyası, FTP-yə brute-force, steqanoqrafiya (şəkil içində gizlədilmiş fayllar) və nəhayət sudo-da olan bir zəiflikdən (<code>CVE-2019-14287</code>) istifadə edərək root əldə etmək tələb olunur. Aşağıda proses zamanı çəkdiyim skrinşotlar və hər addımda nə etdiyimin izahı var.</p>
+  </section>
+
+  <section id="nmap">
+    <div class="section-head"><span class="section-num">01</span><h2>Enumeration — Nmap ilə port skan</h2></div>
+    <p>İlk addım olaraq hədəf maşının açıq portlarını və üzərində işləyən servisləri öyrənmək üçün nmap ilə skan etdim:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>nmap -sV -sC -oN nmap_initial.txt &lt;target-ip&gt;</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/01-nmap-scan.png" alt="nmap skan nəticəsi">
+      <figcaption><span class="tag">Şəkil 01</span><span>nmap skan nəticəsi</span></figcaption>
+    </figure>
+    <p>Nəticədə FTP (21), SSH (22) və HTTP (80) portlarının açıq olduğunu gördüm. HTTP portu üzərindən veb tərəfə keçdim.</p>
+  </section>
+
+  <section id="web">
+    <div class="section-head"><span class="section-num">02</span><h2>Web Enumeration — User-Agent manipulyasiyası</h2></div>
+    <p>Hədəfin IP ünvanını brauzerdə açdıqda səhifədə mənim istifadəçi-agentimlə (User-Agent) bağlı bir mesaj gördüm — sanki server konkret bir User-Agent dəyəri gözləyirdi.</p>
+    <figure class="evidence">
+      <img src="images/02-user-agent-hint.png" alt="Səhifədə görünən User-Agent qeydi">
+      <figcaption><span class="tag">Şəkil 02</span><span>səhifədə görünən User-Agent qeydi</span></figcaption>
+    </figure>
+    <p>Bunu sınamaq üçün sorğunu Burp Suite ilə tutdum (Proxy tabı) və Repeater bölməsinə göndərdim. Sonra HTTP sorğusundakı User-Agent başlığını dəyişib yenidən göndərdim:</p>
+    <figure class="evidence">
+      <img src="images/03-burp-repeater.png" alt="Burp Suite Repeater-də User-Agent başlığının dəyişdirilməsi">
+      <figcaption><span class="tag">Şəkil 03</span><span>Burp Suite Repeater-də User-Agent başlığının dəyişdirilməsi</span></figcaption>
+    </figure>
+    <p>Düzgün dəyəri göndərdikdən sonra səhifə "Follow redirection" düyməsi ilə yeni bir cavab qaytardı. Ora keçdikdə isə serverdə işləyən agentlərdən birinin adını — <b>chris</b> — öyrəndim.</p>
+  </section>
+
+  <section id="ftp">
+    <div class="section-head"><span class="section-num">03</span><h2>FTP-yə Brute-Force (Hydra)</h2></div>
+    <p>"chris" istifadəçisinin FTP parolunu tapmaq üçün Hydra ilə lüğət hücumu (dictionary attack) həyata keçirdim:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>hydra -l chris -P /usr/share/wordlists/rockyou.txt ftp://&lt;target-ip&gt;</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/04-hydra-ftp-bruteforce.png" alt="Hydra ilə FTP parolunun tapılması">
+      <figcaption><span class="tag">Şəkil 04</span><span>Hydra ilə FTP parolunun tapılması</span></figcaption>
+    </figure>
+    <p>Parolu tapdıqdan sonra FTP-yə chris hesabı ilə daxil oldum və serverdə olan faylları (şəkillər) yerli maşına endirdim.</p>
+  </section>
+
+  <section id="stego">
+    <div class="section-head"><span class="section-num">04</span><h2>Steqanoqrafiya təhlili</h2></div>
+
+    <h3>4.1 — Binwalk ilə gizli fayl axtarışı</h3>
+    <p>FTP-dən endirdiyim PNG faylının içində əlavə bir fayl gizlədilib-gizlədilmədiyini yoxlamaq üçün binwalk istifadə etdim:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>binwalk cutie.png</pre>
+    </div>
+    <div class="note"><b>Qeyd:</b> binwalk faylların içərisində gizlədilmiş və ya əlavə olunmuş məlumatları (məsələn, arxivləri) aşkar etmək üçün istifadə olunan bir Linux alətidir.</div>
+    <figure class="evidence">
+      <img src="images/05-binwalk.png" alt="binwalk nəticəsi">
+      <figcaption><span class="tag">Şəkil 05</span><span>şəklin içində bir ZIP faylı aşkarlandı</span></figcaption>
+    </figure>
+    <p>Əlavə olaraq, ExifTool ilə faylın metadata məlumatlarına da baxdım — bu bəzən şəklin mənbəyi və ya əlavə qeydlər barədə faydalı ipucu verə bilir:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>exiftool cutie.png</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/06-exiftool.png" alt="ExifTool ilə metadata baxışı">
+      <figcaption><span class="tag">Şəkil 06</span><span>ExifTool ilə metadata baxışı</span></figcaption>
+    </figure>
+
+    <h3>4.2 — Gizlədilmiş ZIP-in çıxarılması və parolun sındırılması</h3>
+    <p>Binwalk-un tapdığı ZIP-i şəklin içindən ayırdım:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>binwalk -e cutie.png</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/07-dd-extract-zip.png" alt="Gizlədilmiş ZIP faylının çıxarılması">
+      <figcaption><span class="tag">Şəkil 07</span><span>gizlədilmiş ZIP faylının çıxarılması</span></figcaption>
+    </figure>
+    <p>ZIP-i açmağa çalışdıqda parol tələb olundu. Bunun üçün zip2john ilə hash formatına çevirib, John the Ripper ilə sındırdım:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>zip2john cutie.zip &gt; cutie_hash.txt
+john --wordlist=/usr/share/wordlists/rockyou.txt cutie_hash.txt</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/08-zip2john-crack.png" alt="zip2john + John the Ripper: parol tapıldı">
+      <figcaption><span class="tag">Şəkil 08</span><span>parol "alien" tapıldı</span></figcaption>
+    </figure>
+
+    <h3>4.3 — Steghide / Stegseek ilə gizli mesajın tapılması</h3>
+    <p>ZIP-in içindən çıxan <code>cute-alien.jpg</code> faylında da gizli məlumat olub-olmadığını yoxladım:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>steghide info cute-alien.jpg</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/09-steghide-info.png" alt="steghide passphrase tələb edir">
+      <figcaption><span class="tag">Şəkil 09</span><span>steghide passphrase istəyir — deməli gizli fayl var</span></figcaption>
+    </figure>
+    <p>Steghide passphrase istədiyi üçün stegseek alətini istifadə etdim. Stegseek eyni prinsipdə işləyir, sadəcə rockyou.txt lüğətindəki parolları avtomatik sınayaraq daha sürətli nəticə verir:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>stegseek cute-alien.jpg /usr/share/wordlists/rockyou.txt</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/10-stegseek-run.png" alt="stegseek işə salınır">
+      <figcaption><span class="tag">Şəkil 10</span><span>stegseek işə salınır</span></figcaption>
+    </figure>
+    <p>Alət arxa planda belə işləyir:</p>
+    <ul>
+      <li>stegseek şəklin içində Steghide ilə gizlədilmiş məlumat olub-olmadığını yoxlayır;</li>
+      <li>əgər varsa, rockyou.txt lüğətindəki parolları bir-bir sınaqdan keçirir (dictionary attack);</li>
+      <li>düzgün parolu tapanda onu göstərir və gizlədilmiş faylı avtomatik çıxarır.</li>
+    </ul>
+    <figure class="evidence">
+      <img src="images/11-stegseek-result.png" alt="stegseek nəticəsi">
+      <figcaption><span class="tag">Şəkil 11</span><span>parol tapıldı və gizli fayl çıxarıldı</span></figcaption>
+    </figure>
+    <p>Çıxan fayldan <b>james</b> adlı ikinci istifadəçinin adını və SSH parolunu əldə etdim.</p>
+    <figure class="evidence">
+      <img src="images/12-james-credentials.png" alt="james istifadəçisi üçün tapılan etimadnamə">
+      <figcaption><span class="tag">Şəkil 12</span><span>james üçün tapılan etimadnamə (credential)</span></figcaption>
+    </figure>
+  </section>
+
+  <section id="ssh">
+    <div class="section-head"><span class="section-num">05</span><h2>İlkin giriş — SSH ilə daxil olma</h2></div>
+    <p>Tapdığım etimadnamələrlə james istifadəçisi kimi SSH üzərindən serverə daxil oldum:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>ssh james@&lt;target-ip&gt;</pre>
+    </div>
+    <p>Ev qovluğunda <code>user.txt</code> faylını oxuyub istifadəçi bayrağını (user flag) əldə etdim. Eyni qovluqda <code>Alien_autospy.jpg</code> adlı başqa bir şəkil də var idi (fayl adındakı "autospy" yazılışı otağın öz uydurmasıdır, orfoqrafik səhv deyil).</p>
+    <figure class="evidence">
+      <img src="images/13-user-flag-dir.png" alt="user.txt və Alien_autospy.jpg faylının tapılması">
+      <figcaption><span class="tag">Şəkil 13</span><span>user.txt və Alien_autospy.jpg faylının tapılması</span></figcaption>
+    </figure>
+    <p>Şəkli yerli maşınama köçürüb (<code>scp</code>) tərs şəkil axtarışı (reverse image search) etdim. Nəticədə şəklin 1947-ci il Roswell hadisəsi ilə əlaqəli "alien autopsy" görüntüsü olduğunu müəyyən etdim — bu, otağın suallarından birinə cavab verirdi.</p>
+  </section>
+
+  <section id="privesc">
+    <div class="section-head"><span class="section-num">06</span><h2>Privilege Escalation — CVE-2019-14287</h2></div>
+    <p>Root-a keçmək üçün ilk növbədə james istifadəçisinin sudo ilə hansı hüquqlara malik olduğunu yoxladım:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>sudo -l</pre>
+    </div>
+    <figure class="evidence">
+      <img src="images/14-sudo-l.png" alt="sudo -l nəticəsi">
+      <figcaption><span class="tag">Şəkil 14</span><span>sudo -l nəticəsi</span></figcaption>
+    </figure>
+    <p>Adətən gördüyümüz <code>(ALL) ALL</code> əvəzinə burada <code>(ALL, !root) /bin/bash</code> yazılmışdı — yəni james, root istisna olmaqla, istənilən istifadəçi kimi <code>/bin/bash</code> icra edə bilər. Bu qeyri-adi konfiqurasiya bir zəiflik siqnalı idi, ona görə bunu araşdırdım və <b>CVE-2019-14287</b>-ə rast gəldim.</p>
+    <p>CVE-2019-14287 sudo-nun köhnə versiyalarında olan bir zəiflikdir: sudo istifadəçi ID-ni (UID) yoxlayarkən, UID kimi <code>-1</code> və ya onun 32-bit unsigned təmsili olan <code>4294967295</code> dəyəri verildikdə bunu <code>0</code> (yəni root) kimi şərh edir. Nəticədə <code>!root</code> məhdudiyyəti sadəcə fırıldaqla aradan qaldırıla bilir. Bunu belə istismar etdim:</p>
+    <div class="term"><div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>sudo -u#-1 /bin/bash</pre>
+    </div>
+    <p>Bu əmr məni birbaşa root shell-ə apardı və <code>/root/root.txt</code> faylını oxuya bildim.</p>
+  </section>
+
+  <section id="flags">
+    <div class="section-head"><span class="section-num">07</span><h2>Flag-lar</h2></div>
+    <p>Aşağıdakı bayraqlar məxfilik/etik səbəblərdən gizlədilib — otağı özün həll edərkən tam dəyərləri özün əldə edəcəksən.</p>
+    <div class="flag"><span class="label">User flag</span><span class="value">THM{██████████████████████}</span></div>
+    <div class="flag"><span class="label">Root flag</span><span class="value">THM{██████████████████████}</span></div>
+  </section>
+
+  <section id="lessons">
+    <div class="section-head"><span class="section-num">08</span><h2>Nəticə və Öyrənilənlər</h2></div>
+    <ul>
+      <li>HTTP başlıqları (User-Agent və s.) bəzən tətbiqin davranışını dəyişə bilər — bunları həmişə yoxlamaq lazımdır.</li>
+      <li>Zəif parollar hələ də ən çox rast gəlinən zəiflik vektorlarından biridir; FTP və SSH kimi servislərə brute-force həmişə sınamağa dəyər.</li>
+      <li>Şəkil və digər media faylları gözlə görünməyən əlavə məlumatlar (ZIP, mətn və s.) gizlədə bilər — binwalk, exiftool və steghide/stegseek bu cür təhlillər üçün əvəzsiz alətlərdir.</li>
+      <li><code>sudo -l</code> çıxışını diqqətlə oxumaq vacibdir — "ALL" əvəzinə qeyri-standart qaydalar (məsələn "!root") görsən, bu adətən konkret, məlum bir zəifliyə işarədir.</li>
+      <li>Köhnəlmiş proqram versiyaları (bu halda sudo) real CVE-lərə açıq qala bilər — sistemləri müntəzəm yeniləmək kritik əhəmiyyət daşıyır.</li>
+    </ul>
+  </section>
+
+  <section id="tools">
+    <div class="section-head"><span class="section-num">09</span><h2>İstifadə olunan alətlər</h2></div>
+    <div class="tool-grid">
+      <div class="tool-card"><span class="name">nmap</span><span class="desc">Port və servis skanı</span></div>
+      <div class="tool-card"><span class="name">Burp Suite</span><span class="desc">HTTP sorğularının tutulması / dəyişdirilməsi</span></div>
+      <div class="tool-card"><span class="name">Hydra</span><span class="desc">Servislərə brute-force</span></div>
+      <div class="tool-card"><span class="name">binwalk</span><span class="desc">Fayl içində gizli məlumat aşkarlanması</span></div>
+      <div class="tool-card"><span class="name">ExifTool</span><span class="desc">Fayl metadata təhlili</span></div>
+      <div class="tool-card"><span class="name">zip2john / John</span><span class="desc">ZIP parolunun sındırılması</span></div>
+      <div class="tool-card"><span class="name">steghide / stegseek</span><span class="desc">Şəkil steqanoqrafiyası</span></div>
+      <div class="tool-card"><span class="name">ssh / scp</span><span class="desc">Uzaq serverə giriş və fayl köçürülməsi</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>TryHackMe — Agent Sudo</span>
+    <span>Write-up by [Adını bura yaz]</span>
+  </footer>
+
+</div>
+</body>
+</html>
