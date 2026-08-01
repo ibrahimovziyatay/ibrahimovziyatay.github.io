@@ -16,19 +16,16 @@
   h1,.mono{font-family:'JetBrains Mono',monospace;}
   a{color:var(--accent); text-decoration:none;}
   .wrap{max-width:800px; margin:0 auto; padding:0 24px;}
-
   nav{position:sticky; top:0; z-index:50; background:rgba(10,14,20,0.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
   nav .wrap{display:flex; justify-content:space-between; align-items:center; height:64px;}
   .logo{font-family:'JetBrains Mono',monospace; font-weight:700;}
   .logo span{color:var(--accent);}
   .back{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--muted);}
   .back:hover{color:var(--text);}
-
   header{padding:64px 0 40px; border-bottom:1px solid var(--line);}
   .section-label{font-family:'JetBrains Mono',monospace; color:var(--accent); font-size:13px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px;}
   h1{font-size:clamp(28px,4vw,40px); margin-bottom:14px;}
   header p{color:var(--muted); max-width:560px;}
-
   .list{padding:48px 0;}
   .card{
     display:block; background:var(--panel); border:1px solid var(--line);
@@ -39,22 +36,20 @@
   .card-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
   .card h2{font-size:18px; color:var(--text);}
   .diff{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ok); border:1px solid var(--ok); padding:3px 9px; border-radius:4px;}
+  .diff.mixed{color:var(--accent); border-color:var(--accent);}
   .card p{color:var(--muted); font-size:14.5px; margin-bottom:12px;}
   .tags{display:flex; gap:8px; flex-wrap:wrap;}
   .tag{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); border:1px solid var(--line); padding:3px 9px; border-radius:4px;}
-
   .empty{color:var(--muted); font-size:14px; padding:20px 0;}
 </style>
 </head>
 <body>
-
 <nav>
   <div class="wrap">
     <div class="logo">ziyatay<span>@</span>portfolio</div>
     <a class="back" href="../index.html">← əsas səhifə</a>
   </div>
 </nav>
-
 <header>
   <div class="wrap">
     <div class="section-label">// write-ups</div>
@@ -62,10 +57,21 @@
     <p>TryHackMe platformasında həll etdiyim otaqların addım-addım izahlı sənədləri. Hər yazıda recon-dan root-a qədər bütün proses göstərilir.</p>
   </div>
 </header>
-
 <div class="list">
   <div class="wrap">
-
+    <a class="card" href="agent-sudo.html">
+      <div class="card-top">
+        <h2>Agent Sudo</h2>
+        <span class="diff mixed">Easy/Medium</span>
+      </div>
+      <p>HTTP User-Agent manipulyasiyası, FTP brute-force, PNG/JPG steqanoqrafiyası (binwalk, steghide, stegseek) və CVE-2019-14287 ilə sudo bypass edərək root əldə etmək.</p>
+      <div class="tags">
+        <span class="tag">Web</span>
+        <span class="tag">FTP</span>
+        <span class="tag">Steganography</span>
+        <span class="tag">CVE-2019-14287</span>
+      </div>
+    </a>
     <a class="card" href="kenobi.html">
       <div class="card-top">
         <h2>Kenobi</h2>
@@ -79,11 +85,8 @@
         <span class="tag">Privilege Escalation</span>
       </div>
     </a>
-
     <!-- Yeni write-up əlavə etmək üçün yuxarıdakı <a class="card">...</a> blokunu kopyala və məlumatları dəyiş -->
-
   </div>
 </div>
-
 </body>
 </html>
