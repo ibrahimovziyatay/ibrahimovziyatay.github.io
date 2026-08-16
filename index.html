@@ -182,6 +182,121 @@
     .project{grid-template-columns:1fr;}
     .project .idx{padding-top:0;}
   }
+
+  /* ---------- WRITE-UPS CTA ---------- */
+  .writeups-cta{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 560px;
+    margin-top: 18px;
+    padding: 22px 26px;
+    background: linear-gradient(135deg, #10161F 0%, #141b26 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    overflow: hidden;
+    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .writeups-cta::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(420px circle at var(--mx,50%) var(--my,50%), rgba(232,163,61,0.10), transparent 60%);
+    opacity:0;
+    transition: opacity .3s ease;
+    pointer-events:none;
+  }
+  .writeups-cta:hover::before{ opacity:1; }
+  .writeups-cta:hover{
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px -12px rgba(232,163,61,0.35);
+    text-decoration: none;
+  }
+  .cta-icon{
+    flex-shrink:0;
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: #0d1219;
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace;
+    color: var(--ok);
+    font-size: 20px;
+    font-weight:700;
+    position: relative;
+    transition: border-color .25s ease, color .25s ease;
+  }
+  .writeups-cta:hover .cta-icon{
+    border-color: var(--ok);
+    color: var(--accent);
+  }
+  .cta-icon .caret{
+    display:inline-block;
+    width: 8px; height: 2px;
+    background: currentColor;
+    margin-left: 2px;
+    animation: cta-blink 1.1s steps(1) infinite;
+  }
+  @keyframes cta-blink{ 50%{ opacity: 0; } }
+  .cta-body{ flex: 1; min-width:0; }
+  .cta-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ok);
+    margin-bottom: 4px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .cta-eyebrow .dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--ok);
+    box-shadow: 0 0 8px var(--ok);
+  }
+  .cta-title{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .cta-sub{
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .cta-arrow{
+    flex-shrink:0;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--muted);
+    transition: all .25s ease;
+  }
+  .writeups-cta:hover .cta-arrow{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0A0E14;
+    transform: translateX(4px);
+  }
+  .cta-arrow svg{ width:16px; height:16px; }
+  .cta-count{
+    position:absolute;
+    top: 14px; right: 14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.02);
+  }
+  @media (max-width:600px){
+    .cta-count{ display:none; }
+    .writeups-cta{ padding:18px 20px; gap:14px; }
+  }
 </style>
 </head>
 <body>
@@ -303,7 +418,18 @@
         <h3>CTF Write-up Arxivi</h3>
         <p>Həll etdiyim CTF tapşırıqlarının addım-addım izahlı sənədləri. GitHub repo-da toplanır.</p>
         <div class="tags"><span class="tag">CTF</span><span class="tag">Write-up</span></div>
-        <a class="project-link" href="writeups/index.html">Bütün write-up-lara bax →</a>
+        <a class="writeups-cta" href="writeups/index.html" id="writeups-cta">
+          <span class="cta-count">3 write-up</span>
+          <span class="cta-icon">&gt;<span class="caret"></span></span>
+          <span class="cta-body">
+            <span class="cta-eyebrow"><span class="dot"></span>CTF Arxivi</span>
+            <span class="cta-title">Bütün write-up-lara bax</span>
+            <span class="cta-sub">TryHackMe otaqlarının addım-addım həlli — recon-dan root-a qədər</span>
+          </span>
+          <span class="cta-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </span>
+        </a>
       </div>
     </div>
   </div>
@@ -347,6 +473,15 @@
     <p class="footnote">© 2026 Ziyatay İbrahimzadə. Bu sayt GitHub Pages üzərində hostlanır.</p>
   </div>
 </footer>
+
+<script>
+  const writeupsCta = document.getElementById('writeups-cta');
+  writeupsCta.addEventListener('mousemove', (e) => {
+    const r = writeupsCta.getBoundingClientRect();
+    writeupsCta.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    writeupsCta.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
+</script>
 
 </body>
 </html>
