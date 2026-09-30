@@ -289,6 +289,10 @@
   .cert-card:hover { border-color: var(--accent-amber); transform: translateY(-2px); }
   .cert-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; color: var(--text); }
   .cert-date { color: var(--accent-amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  
+  .cert-link { text-decoration: none; }
+  .cert-link .cert-name { color: var(--accent-cyan); transition: color 0.25s ease; }
+  .cert-link:hover .cert-name { color: var(--accent-green); text-decoration: underline; }
 
   /* FOOTER & CONTACT */
   footer { padding: 80px 0 40px; text-align: center; }
@@ -447,34 +451,9 @@
     <h2 class="section-title">CTF & Vulnerability Write-ups</h2>
 
     <div class="project-list">
+      <!-- 01: CTF Write-up Arxivi (1-ci sıraya keçirildi) -->
       <div class="project-card">
         <div class="project-idx">01</div>
-        <div class="project-content">
-          <h3>TryHackMe — XXE Injection Lab</h3>
-          <p>XLSX fayl yükləmə funksionallığı üzərindən XML External Entity (XXE) injection zəifliyinin istismarı. Content-Type daxilində XML strukturunun dəyişdirilməsi və X-Token header-ləri vasitəsilə gizli flag-in retrieved olunması.</p>
-          <div class="tags">
-            <span class="tag">XXE</span>
-            <span class="tag">Web Pentesting</span>
-            <span class="tag">HTTP Headers</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-card">
-        <div class="project-idx">02</div>
-        <div class="project-content">
-          <h3>NahamStore — Open Redirect Analysis</h3>
-          <p>Arjun aləti vasitəsilə gizli HTTP parametrlərinin tapılması və istifadəçiləri kənar zərərli domenlərə yönləndirən Open Redirect zəifliyinin sənədləşdirilmiş analizi.</p>
-          <div class="tags">
-            <span class="tag">Open Redirect</span>
-            <span class="tag">Arjun</span>
-            <span class="tag">Recon</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-card">
-        <div class="project-idx">03</div>
         <div class="project-content">
           <h3>CTF Write-up Arxivi</h3>
           <p>TryHackMe (30-a yaxın CTF) və Hack The Box Starting Point tapşırıqlarının addım-addım həll yolları və zəiflik analizi sənədləri.</p>
@@ -494,6 +473,34 @@
           </a>
         </div>
       </div>
+
+      <!-- 02: XXE Injection Lab -->
+      <div class="project-card">
+        <div class="project-idx">02</div>
+        <div class="project-content">
+          <h3>TryHackMe — XXE Injection Lab</h3>
+          <p>XLSX fayl yükləmə funksionallığı üzərindən XML External Entity (XXE) injection zəifliyinin istismarı. Content-Type daxilində XML strukturunun dəyişdirilməsi və X-Token header-ləri vasitəsilə gizli flag-in retrieved olunması.</p>
+          <div class="tags">
+            <span class="tag">XXE</span>
+            <span class="tag">Web Pentesting</span>
+            <span class="tag">HTTP Headers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03: Open Redirect Analysis -->
+      <div class="project-card">
+        <div class="project-idx">03</div>
+        <div class="project-content">
+          <h3>NahamStore — Open Redirect Analysis</h3>
+          <p>Arjun aləti vasitəsilə gizli HTTP parametrlərinin tapılması və istifadəçiləri kənar zərərli domenlərə yönləndirən Open Redirect zəifliyinin sənədləşdirilmiş analizi.</p>
+          <div class="tags">
+            <span class="tag">Open Redirect</span>
+            <span class="tag">Arjun</span>
+            <span class="tag">Recon</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -504,19 +511,21 @@
     <h2 class="section-title">Sertifikatlar & Hədəflər</h2>
     <div class="cert-grid">
       <div class="cert-card">
-        <div class="cert-name">WEB RTA (Web Real-Time Attacks)</div>
-        <div class="cert-date">Eldə olunub</div>
-      </div>
-      <div class="cert-card">
-        <div class="cert-name">eJPT (eLearnSecurity Junior Penetration Tester)</div>
-        <div class="cert-date">Hazırlıq Tamamlanıb</div>
+        <a href="https://labs.cyberwarfare.live/credential/achievement/6aa9845365159096bae36d43" target="_blank" class="cert-link">
+          <div class="cert-name">WEB RTA (Certified Web Red Team Analyst) ↗</div>
+        </a>
+        <div class="cert-date">Eldə olunub (2026)</div>
       </div>
       <div class="cert-card">
         <div class="cert-name">TryHackMe — Jr Penetration Tester</div>
         <div class="cert-date">Tamamlanıb</div>
       </div>
       <div class="cert-card">
-        <div class="cert-name">TryHackMe — Pre Security / Cyber 101</div>
+        <div class="cert-name">TryHackMe — CyberSecurity 101 Path</div>
+        <div class="cert-date">Tamamlanıb</div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">TryHackMe — Pre Security (Legacy)</div>
         <div class="cert-date">Tamamlanıb</div>
       </div>
     </div>
