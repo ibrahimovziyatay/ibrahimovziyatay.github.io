@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ziyatay İbrahimzadə — Cybersecurity Portfolio</title>
+<title>Ziyatay İbrahimzadə — Web Pentesting & Security Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -317,7 +317,7 @@
 <nav>
   <div class="wrap">
     <div class="logo">
-      <span class="logo-prompt">ziyatay@security:~$</span> <span>./portfolio.sh</span>
+      <span class="logo-prompt">ziyatay@web-sec:~$</span> <span>./portfolio.sh</span>
     </div>
     <div class="navlinks">
       <a href="#about">Haqqımda</a>
@@ -332,12 +332,10 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow"><span class="pulse-dot"></span> Status: Aktiv öyrənir & CTF Player</div>
-      <h1 class="title">Salam, mən <span class="accent">Ziyatay</span>.<br>Cybersecurity & Pentesting Mütəxəssisi.</h1>
+      <div class="eyebrow"><span class="pulse-dot"></span> Status: Web Application Security Specialist</div>
+      <h1 class="title">Salam, mən <span class="accent">Ziyatay</span>.<br>Web Pentesting üzrə dərinləşən mütəxəssis.</h1>
       <p class="subtitle">
-        Azərbaycan Dövlət Neft və Sənaye Universitetində İnformasiya Təhlükəsizliyi üzrə təhsil alıram. 
-        Şəbəkə infrastrukturu, penetration testing və sistem təhlükəsizliyi üzrə praktiki biliklərimi TryHackMe, 
-        HackTheBox və Home Lab mühitində tətbiq edirəm.
+        Veb tətbiqlərin təhlükəsizliyi, zəifliklərin aşkar olunması (OWASP Top 10) və nüfuzetmə sınaqları (Web Pentesting) istiqamətində praktiki biliklərimi inkişaf etdirirəm. PortSwigger Web Security Academy, TryHackMe və Hack The Box üzərində mürəkkəb zəiflik ssenariləri həll edirəm.
       </p>
       <div class="hero-actions">
         <a class="btn primary" href="#projects">Layihələrə bax</a>
@@ -353,29 +351,28 @@
           <div class="dot yellow"></div>
           <div class="dot green"></div>
         </div>
-        <div class="terminal-title">bash - 80x24</div>
+        <div class="terminal-title">burp-suite / web-recon</div>
       </div>
       <div class="terminal-body">
         <div class="term-line">
-          <span class="term-prompt">ziyatay@kali:~$</span>
-          <span class="term-cmd">whoami</span>
+          <span class="term-prompt">ziyatay@sec:~$</span>
+          <span class="term-cmd">arjun -u https://target.app/api -m POST</span>
         </div>
-        <div class="term-output">Junior Penetration Tester & Security Student</div>
+        <div class="term-output">[+] Hidden parameter found: "redirect_uri"</div>
         <div class="term-line" style="margin-top: 12px;">
-          <span class="term-prompt">ziyatay@kali:~$</span>
-          <span class="term-cmd">nmap -sV target.local</span>
+          <span class="term-prompt">ziyatay@sec:~$</span>
+          <span class="term-cmd">curl -X POST -H "Content-Type: application/xml"</span>
         </div>
         <div class="term-output">
-          PORT   STATE SERVICE VERSION<br>
-          22/tcp open  ssh     OpenSSH 8.9p1<br>
-          80/tcp open  http    Apache httpd 2.4.52<br>
-          445/tcp open smb     Samba 4.15.13
+          &lt;!DOCTYPE test [&lt;!ENTITY xxe SYSTEM "file:///flag.txt"&gt;]&gt;<br>
+          HTTP/1.1 200 OK<br>
+          Response: THM{xxe_injection_successful}
         </div>
         <div class="term-line" style="margin-top: 12px;">
-          <span class="term-prompt">ziyatay@kali:~$</span>
-          <span class="term-cmd">cat target_status.txt</span>
+          <span class="term-prompt">ziyatay@sec:~$</span>
+          <span class="term-cmd">cat owasp_progress.status</span>
         </div>
-        <div class="term-output" style="color: var(--accent-green);">[+] Target Pwned! Root Flag Captured.</div>
+        <div class="term-output" style="color: var(--accent-green);">[+] SSRF, XXE, SQLi, XSS & CSRF Labs Mastered!</div>
       </div>
     </div>
   </div>
@@ -387,10 +384,7 @@
     <h2 class="section-title">Kiməm?</h2>
     <div class="about-card">
       <p class="about-text">
-        Kibertəhlükəsizlik sahəsinə <strong>Network (Şəbəkə)</strong> əsasları ilə addım atmışam və hazırda 
-        <strong>Ethical Hacking</strong>, <strong>Web Pentesting</strong> və <strong>System Administration</strong> 
-        istiqamətində praktiki təcrübəmi artırıram. Şəxsi Home Lab mühitində mürəkkəb şəbəkə topologiyaları qurur, 
-        zəiflikləri analizi edir və CTF platformalarında addım-addım həll yolları (write-ups) hazırlayıram.
+        Şəbəkə əsaslarından başlayaraq diqqətimi tam olaraq <strong>Web Application Security</strong> və <strong>Pentesting</strong> sahəsinə yönəltmişəm. Özümü müstəqil şəkildə inkişaf etdirərək <strong>WEB RTA</strong> sertifikatını əldə etmişəm və <strong>eJPT</strong> imtahanına hazırlığı yekunlaşdırmışam. PortSwigger Web Security Academy üzərində intensiv təlim proqramı ilə SSRF, XXE, SQL Injection, XSS və CSRF kimi mürəkkəb veb zəifliklərinin mexanizmini və praktiki eksploitasiya metodlarını öyrənirəm.
       </p>
     </div>
   </div>
@@ -404,44 +398,44 @@
       <div class="skill-node">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
-          <h3>Networking</h3>
+          <h3>Web Pentesting (OWASP)</h3>
         </div>
-        <p>TCP/IP, Subnetting, VLAN, Routing, Packet Tracer və GNS3 ilə praktika.</p>
+        <p>SSRF, XXE Injection, SQLi, Cross-Site Scripting (XSS), CSRF və Open Redirect zəifliklərinin analizi.</p>
       </div>
       <div class="skill-node">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
-          <h3>Trafik Analizi</h3>
+          <h3>Pentest Alətləri</h3>
         </div>
-        <p>Wireshark ilə paketlərin dərin analizi, ARP/DNS Spoofing konseptləri.</p>
+        <p>Burp Suite (Repeater, Intruder, Extensions), Arjun (Parameter Discovery), Nmap, Metasploit, OpenSSL.</p>
       </div>
       <div class="skill-node">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
-          <h3>Pentesting & Tools</h3>
+          <h3>Reconnaissance & Discovery</h3>
         </div>
-        <p>Nmap, Metasploit, Burp Suite, Hydra, Gobuster ilə zəifliklərin tapılması.</p>
+        <p>Gizli parametrlərin və subdomenlərin aşkar edilməsi, HTTP Traffic Interception və Header Manipulation.</p>
       </div>
       <div class="skill-node">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
-          <h3>Sistemlər</h3>
+          <h3>Sistem & Konteynrlər</h3>
         </div>
-        <p>Linux (Kali / Ubuntu), Windows Server, Virtualization (VMware/VirtualBox).</p>
+        <p>Linux (Kali / Ubuntu CLI), Docker Compose ilə laboratoriya mühitlərinin qurulması, Windows Server.</p>
       </div>
       <div class="skill-node">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
-          <h3>Skriptləşdirmə</h3>
+          <h3>Networking & Crypto</h3>
         </div>
-        <p>Bash və Python ilə sadə avtomatlaşdırma və exploit skriptləri.</p>
+        <p>TCP/IP, Subnetting, Wireshark ilə paket analizi, OpenSSL ilə fayl və məlumat şifrələmə texnikaları.</p>
       </div>
       <div class="skill-node">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
-          <h3>Sənədləşdirmə</h3>
+          <h3>Sənədləşdirmə & Report</h3>
         </div>
-        <p>CTF Write-up-ları, Texniki hesabatların (Pentest Report) hazırlanması.</p>
+        <p>Vulnerability Assessment və Pentest reportlarının (Vulnerability Write-ups) peşəkar formatda tərtibi.</p>
       </div>
     </div>
   </div>
@@ -450,18 +444,18 @@
 <section id="projects">
   <div class="wrap">
     <div class="section-label">Layihələr</div>
-    <h2 class="section-title">CTF & Home Lab</h2>
+    <h2 class="section-title">CTF & Vulnerability Write-ups</h2>
 
     <div class="project-list">
       <div class="project-card">
         <div class="project-idx">01</div>
         <div class="project-content">
-          <h3>TryHackMe — Blue Lab</h3>
-          <p>EternalBlue (MS17-010) zəifliyindən istifadə edərək Windows sisteminə təhlükəsiz giriş simulyasiyası. Metasploit aləti ilə exploit prosesi icra olunmuş və sənədləşdirilmişdir.</p>
+          <h3>TryHackMe — XXE Injection Lab</h3>
+          <p>XLSX fayl yükləmə funksionallığı üzərindən XML External Entity (XXE) injection zəifliyinin istismarı. Content-Type daxilində XML strukturunun dəyişdirilməsi və X-Token header-ləri vasitəsilə gizli flag-in retrieved olunması.</p>
           <div class="tags">
-            <span class="tag">Windows</span>
-            <span class="tag">Metasploit</span>
-            <span class="tag">SMB Vulnerability</span>
+            <span class="tag">XXE</span>
+            <span class="tag">Web Pentesting</span>
+            <span class="tag">HTTP Headers</span>
           </div>
         </div>
       </div>
@@ -469,12 +463,12 @@
       <div class="project-card">
         <div class="project-idx">02</div>
         <div class="project-content">
-          <h3>Home Lab — Şəbəkə Seqmentasiyası</h3>
-          <p>VLAN texnologiyası vasitəsilə daxili şəbəkənin təhlükəsiz zonalaşdırılması və Firewall qaydaları vasitəsilə paket trafiki nəzarəti layihəsi.</p>
+          <h3>NahamStore — Open Redirect Analysis</h3>
+          <p>Arjun aləti vasitəsilə gizli HTTP parametrlərinin tapılması və istifadəçiləri kənar zərərli domenlərə yönləndirən Open Redirect zəifliyinin sənədləşdirilmiş analizi.</p>
           <div class="tags">
-            <span class="tag">VLAN</span>
-            <span class="tag">Firewall</span>
-            <span class="tag">GNS3</span>
+            <span class="tag">Open Redirect</span>
+            <span class="tag">Arjun</span>
+            <span class="tag">Recon</span>
           </div>
         </div>
       </div>
@@ -483,10 +477,11 @@
         <div class="project-idx">03</div>
         <div class="project-content">
           <h3>CTF Write-up Arxivi</h3>
-          <p>Həll edilən CTF tapşırıqlarının, maşınlarının təhlil və ad addım həll yollarının GitHub repozitoriyasında toplanması.</p>
+          <p>TryHackMe (30-a yaxın CTF) və Hack The Box Starting Point tapşırıqlarının addım-addım həll yolları və zəiflik analizi sənədləri.</p>
           <div class="tags">
-            <span class="tag">CTF</span>
-            <span class="tag">Documentation</span>
+            <span class="tag">PortSwigger</span>
+            <span class="tag">TryHackMe</span>
+            <span class="tag">Hack The Box</span>
           </div>
           
           <a class="writeups-cta" href="writeups/index.html">
@@ -495,7 +490,7 @@
               <div class="cta-title">Bütün Write-up-lara Bax</div>
               <div class="cta-sub">Reconnaissance mərhələsindən Root hüquqlarının alınmasına qədər.</div>
             </div>
-            <span class="cta-count">3 write-up</span>
+            <span class="cta-count">Write-up Arxivi</span>
           </a>
         </div>
       </div>
@@ -509,20 +504,20 @@
     <h2 class="section-title">Sertifikatlar & Hədəflər</h2>
     <div class="cert-grid">
       <div class="cert-card">
+        <div class="cert-name">WEB RTA (Web Real-Time Attacks)</div>
+        <div class="cert-date">Eldə olunub</div>
+      </div>
+      <div class="cert-card">
         <div class="cert-name">eJPT (eLearnSecurity Junior Penetration Tester)</div>
-        <div class="cert-date">Planlaşdırılır (2026)</div>
+        <div class="cert-date">Hazırlıq Tamamlanıb</div>
       </div>
       <div class="cert-card">
         <div class="cert-name">TryHackMe — Jr Penetration Tester</div>
-        <div class="cert-date">2025</div>
+        <div class="cert-date">Tamamlanıb</div>
       </div>
       <div class="cert-card">
-        <div class="cert-name">TryHackMe — CyberSecurity 101 Path</div>
-        <div class="cert-date">2025</div>
-      </div>
-      <div class="cert-card">
-        <div class="cert-name">TryHackMe — Pre Security (Legacy)</div>
-        <div class="cert-date">2025</div>
+        <div class="cert-name">TryHackMe — Pre Security / Cyber 101</div>
+        <div class="cert-date">Tamamlanıb</div>
       </div>
     </div>
   </div>
@@ -531,14 +526,14 @@
 <footer id="contact">
   <div class="wrap">
     <h2>Əlaqə Saxlayaq</h2>
-    <p>Kibertəhlükəsizlik layihələri, təkliflər və əməkdaşlıq üçün mənə yazın.</p>
+    <p>Veb təhlükəsizlik layihələri, təkliflər və əməkdaşlıq üçün mənə yazın.</p>
     <div class="contact-links">
       <a class="contact-btn" href="mailto:ibrahimovziyatay0@gmail.com">email</a>
       <a class="contact-btn" href="tel:+994775312204">+994 77 531 22 04</a>
       <a class="contact-btn" href="https://www.linkedin.com/in/ziyatay-ibrahimzadə-5292b032b" target="_blank">linkedin</a>
       <a class="contact-btn" href="https://github.com/ibrahimovziyatay" target="_blank">github</a>
     </div>
-    <p class="footnote">© 2026 Ziyatay İbrahimzadə. GitHub Pages üzərində host olunur.</p>
+    <p class="footnote">© Ziyatay İbrahimzadə. GitHub Pages üzərində host olunur.</p>
   </div>
 </footer>
 
