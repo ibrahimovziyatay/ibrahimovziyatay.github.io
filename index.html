@@ -8,19 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #070A10;
-    --panel: rgba(15, 23, 38, 0.7);
-    --panel-solid: #0F1726;
-    --panel-border: rgba(30, 41, 59, 0.8);
-    --line: #1E293B;
+    --bg: #050811;
+    --panel: rgba(13, 20, 36, 0.65);
+    --panel-solid: #0A101D;
+    --panel-border: rgba(0, 240, 255, 0.15);
+    --line: #162032;
     --text: #F1F5F9;
-    --muted: #94A3B8;
+    --muted: #8E9BAE;
     --accent-cyan: #00F0FF;
     --accent-green: #00FF9D;
     --accent-amber: #FFB800;
-    --accent-purple: #7000FF;
-    --glow-cyan: rgba(0, 240, 255, 0.15);
-    --glow-green: rgba(0, 255, 157, 0.15);
+    --accent-purple: #8A2BE2;
+    --glow-cyan: rgba(0, 240, 255, 0.25);
+    --glow-green: rgba(0, 255, 157, 0.25);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -32,26 +32,33 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
-    background-image: 
-      radial-gradient(circle at 15% 15%, rgba(112, 0, 255, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 85% 65%, rgba(0, 240, 255, 0.06) 0%, transparent 45%),
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    position: relative;
+  }
+
+  /* CANVAS BACKGROUND (MATRIX EFFECT) */
+  #hero-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.22;
+    pointer-events: none;
   }
 
   h1, h2, h3, .mono { font-family: 'JetBrains Mono', monospace; }
-  a { color: var(--accent-cyan); text-decoration: none; transition: all 0.25s ease; }
-  a:hover { color: var(--accent-green); text-decoration: none; }
+  a { color: var(--accent-cyan); text-decoration: none; transition: all 0.3s ease; }
+  a:hover { color: var(--accent-green); }
   ::selection { background: var(--accent-cyan); color: #000; }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
 
   /* NAV */
   nav {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(7, 10, 16, 0.8);
-    backdrop-filter: blur(12px);
+    background: rgba(5, 8, 17, 0.85);
+    backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--panel-border);
   }
   nav .wrap {
@@ -61,30 +68,30 @@
   .logo {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
-    font-size: 16px;
-    letter-spacing: -0.5px;
+    font-size: 15px;
     display: flex; align-items: center; gap: 8px;
   }
-  .logo-prompt { color: var(--accent-green); }
+  .logo-prompt { color: var(--accent-green); text-shadow: 0 0 8px rgba(0,255,157,0.4); }
   .logo span { color: var(--accent-cyan); }
   .navlinks { display: flex; gap: 28px; font-size: 14px; font-family: 'JetBrains Mono', monospace; }
-  .navlinks a { color: var(--muted); position: relative; }
+  .navlinks a { color: var(--muted); position: relative; transition: color 0.3s; }
   .navlinks a:hover { color: var(--text); }
   .navlinks a::after {
     content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
-    background: var(--accent-cyan); transition: width 0.25s ease;
+    background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); transition: width 0.3s ease;
   }
   .navlinks a:hover::after { width: 100%; }
 
   /* HERO SECTION */
   header.hero {
-    padding: 90px 0 80px;
+    padding: 100px 0 90px;
     position: relative;
     border-bottom: 1px solid var(--line);
+    overflow: hidden;
   }
   .hero-grid {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1.15fr 0.85fr;
     gap: 40px;
     align-items: center;
   }
@@ -97,15 +104,15 @@
     box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
   }
   .eyebrow .pulse-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green);
-    animation: blink 1.8s infinite;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-green); box-shadow: 0 0 12px var(--accent-green);
+    animation: blink 1.6s infinite alternate;
   }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes blink { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
 
   h1.title {
-    font-size: clamp(30px, 4.2vw, 48px);
-    font-weight: 700;
+    font-size: clamp(32px, 4.2vw, 48px);
+    font-weight: 800;
     line-height: 1.2;
     margin-bottom: 20px;
     letter-spacing: -1px;
@@ -115,6 +122,7 @@
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
     -webkit-background-clip: text;
     background-clip: text;
+    text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
   }
   .subtitle {
     color: var(--muted);
@@ -128,10 +136,11 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     font-weight: 600;
-    padding: 12px 24px;
+    padding: 12px 26px;
     border-radius: 8px;
-    transition: all 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer;
   }
   .btn.primary {
     background: var(--accent-cyan); color: #000;
@@ -140,47 +149,64 @@
   }
   .btn.primary:hover {
     background: var(--accent-green); border-color: var(--accent-green);
-    box-shadow: 0 0 25px var(--glow-green); transform: translateY(-2px);
+    box-shadow: 0 0 30px var(--glow-green); transform: translateY(-3px);
   }
   .btn.ghost {
     background: rgba(255, 255, 255, 0.03);
     color: var(--text); border: 1px solid var(--panel-border);
   }
   .btn.ghost:hover {
-    border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.05);
-    transform: translateY(-2px);
+    border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.08);
+    transform: translateY(-3px); box-shadow: 0 0 20px rgba(0,240,255,0.15);
   }
 
-  /* TERMINAL WIDGET */
+  /* TERMINAL WIDGET WITH 3D TILT EFFECT */
+  .tilt-card {
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+  }
+  
   .terminal-box {
-    background: #0B0F19;
+    background: rgba(10, 16, 29, 0.85);
     border: 1px solid var(--panel-border);
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.05);
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
+    backdrop-filter: blur(12px);
   }
   .terminal-header {
-    background: #111726;
-    padding: 10px 16px;
+    background: rgba(17, 26, 45, 0.9);
+    padding: 12px 18px;
     display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid var(--line);
   }
-  .terminal-dots { display: flex; gap: 6px; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot.red { background: #FF5F56; }
-  .dot.yellow { background: #FFBD2E; }
-  .dot.green { background: #27C93F; }
+  .terminal-dots { display: flex; gap: 8px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot.red { background: #FF5F56; box-shadow: 0 0 8px rgba(255,95,86,0.5); }
+  .dot.yellow { background: #FFBD2E; box-shadow: 0 0 8px rgba(255,189,46,0.5); }
+  .dot.green { background: #27C93F; box-shadow: 0 0 8px rgba(39,201,63,0.5); }
   .terminal-title { color: var(--muted); font-size: 11px; }
-  .terminal-body { padding: 20px; color: #D1D5DB; }
-  .term-line { margin-bottom: 10px; display: flex; gap: 8px; }
+  .terminal-body { padding: 22px; color: #D1D5DB; }
+  .term-line { margin-bottom: 12px; display: flex; gap: 8px; }
   .term-prompt { color: var(--accent-green); font-weight: bold; }
   .term-cmd { color: var(--accent-cyan); }
-  .term-output { color: var(--muted); padding-left: 16px; font-size: 12px; }
+  .term-output { color: var(--muted); padding-left: 16px; font-size: 12px; line-height: 1.5; }
+
+  /* SCROLL REVEAL ANIMATION CLASSES */
+  .reveal {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   /* SECTIONS */
-  section { padding: 80px 0; border-bottom: 1px solid var(--line); }
+  section { padding: 90px 0; border-bottom: 1px solid var(--line); position: relative; z-index: 2; }
   .section-label {
     font-family: 'JetBrains Mono', monospace;
     color: var(--accent-cyan); font-size: 12px;
@@ -188,14 +214,15 @@
     margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
   }
   .section-label::before { content: '//'; color: var(--accent-green); }
-  h2.section-title { font-size: 32px; margin-bottom: 36px; font-weight: 700; letter-spacing: -0.5px; }
+  h2.section-title { font-size: 32px; margin-bottom: 40px; font-weight: 700; letter-spacing: -0.5px; }
 
   /* ABOUT */
   .about-card {
     background: var(--panel);
     border: 1px solid var(--panel-border);
-    padding: 32px; border-radius: 16px;
-    backdrop-filter: blur(10px);
+    padding: 36px; border-radius: 16px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   }
   .about-text { color: var(--muted); font-size: 17px; line-height: 1.8; }
   .about-text strong { color: var(--text); font-weight: 600; }
@@ -207,53 +234,52 @@
   }
   .skill-node {
     background: var(--panel); border: 1px solid var(--panel-border);
-    border-radius: 12px; padding: 24px; position: relative;
-    transition: all 0.3s ease; backdrop-filter: blur(10px);
+    border-radius: 14px; padding: 26px; position: relative;
+    backdrop-filter: blur(12px);
   }
   .skill-node:hover {
     border-color: var(--accent-cyan);
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0, 240, 255, 0.08);
+    box-shadow: 0 12px 35px rgba(0, 240, 255, 0.12);
   }
-  .skill-node-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .skill-node-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .skill-node-icon {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green);
+    background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green);
   }
-  .skill-node h3 { font-size: 16px; color: var(--text); }
+  .skill-node h3 { font-size: 17px; color: var(--text); }
   .skill-node p { color: var(--muted); font-size: 14px; }
 
   /* PROJECTS */
   .project-list { display: flex; flex-direction: column; gap: 24px; }
   .project-card {
     background: var(--panel); border: 1px solid var(--panel-border);
-    border-radius: 16px; padding: 30px;
+    border-radius: 16px; padding: 32px;
     display: grid; grid-template-columns: 60px 1fr; gap: 20px;
-    transition: all 0.3s ease; backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
   }
   .project-card:hover {
     border-color: rgba(0, 240, 255, 0.4);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.1);
   }
   .project-idx {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 18px; font-weight: 700; color: var(--accent-cyan); opacity: 0.8;
+    font-size: 20px; font-weight: 700; color: var(--accent-cyan); opacity: 0.9;
   }
-  .project-content h3 { font-size: 20px; margin-bottom: 8px; }
-  .project-content p { color: var(--muted); font-size: 15px; margin-bottom: 16px; }
+  .project-content h3 { font-size: 21px; margin-bottom: 10px; }
+  .project-content p { color: var(--muted); font-size: 15px; margin-bottom: 18px; }
   .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
   .tag {
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    color: var(--accent-green); background: rgba(0, 255, 157, 0.06);
-    border: 1px solid rgba(0, 255, 157, 0.2);
-    padding: 4px 10px; border-radius: 6px;
+    color: var(--accent-green); background: rgba(0, 255, 157, 0.08);
+    border: 1px solid rgba(0, 255, 157, 0.25);
+    padding: 4px 12px; border-radius: 6px;
   }
 
   /* WRITE-UPS CTA */
   .writeups-cta {
     display: flex; align-items: center; gap: 20px;
     margin-top: 20px; padding: 22px 26px;
-    background: linear-gradient(135deg, rgba(15, 23, 38, 0.9), rgba(11, 15, 25, 0.9));
+    background: linear-gradient(135deg, rgba(13, 20, 36, 0.95), rgba(7, 10, 17, 0.95));
     border: 1px solid var(--panel-border); border-radius: 14px;
     position: relative; overflow: hidden;
     transition: all 0.3s ease;
@@ -268,6 +294,7 @@
     background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent-cyan);
     display: flex; align-items: center; justify-content: center;
     color: var(--accent-cyan); font-weight: bold; font-size: 18px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.2);
   }
   .cta-body { flex: 1; }
   .cta-title { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text); font-size: 16px; }
@@ -275,18 +302,18 @@
   .cta-count {
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
     background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line);
-    padding: 4px 10px; border-radius: 20px; color: var(--accent-amber);
+    padding: 4px 12px; border-radius: 20px; color: var(--accent-amber);
   }
 
   /* CERTS */
-  .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
   .cert-card {
     background: var(--panel); border: 1px solid var(--panel-border);
-    padding: 20px 24px; border-radius: 12px;
+    padding: 22px 26px; border-radius: 14px;
     display: flex; flex-direction: column; justify-content: space-between;
-    transition: all 0.25s ease;
+    backdrop-filter: blur(12px);
   }
-  .cert-card:hover { border-color: var(--accent-amber); transform: translateY(-2px); }
+  .cert-card:hover { border-color: var(--accent-amber); box-shadow: 0 8px 25px rgba(255,184,0,0.12); }
   .cert-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; color: var(--text); }
   .cert-date { color: var(--accent-amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   
@@ -295,18 +322,19 @@
   .cert-link:hover .cert-name { color: var(--accent-green); text-decoration: underline; }
 
   /* FOOTER & CONTACT */
-  footer { padding: 80px 0 40px; text-align: center; }
-  footer h2 { font-size: 28px; margin-bottom: 12px; }
-  footer p { color: var(--muted); margin-bottom: 32px; }
+  footer { padding: 90px 0 40px; text-align: center; position: relative; z-index: 2; }
+  footer h2 { font-size: 30px; margin-bottom: 12px; }
+  footer p { color: var(--muted); margin-bottom: 36px; }
   .contact-links {
     display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
     font-family: 'JetBrains Mono', monospace; font-size: 14px;
   }
   .contact-btn {
     background: var(--panel); border: 1px solid var(--panel-border);
-    padding: 10px 20px; border-radius: 8px; color: var(--text);
+    padding: 12px 24px; border-radius: 10px; color: var(--text);
+    backdrop-filter: blur(12px);
   }
-  .contact-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .contact-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.2); }
   .footnote { margin-top: 60px; color: var(--muted); font-size: 13px; }
 
   @media (max-width: 868px) {
@@ -334,8 +362,10 @@
 </nav>
 
 <header class="hero">
+  <canvas id="hero-canvas"></canvas>
+  
   <div class="wrap hero-grid">
-    <div>
+    <div class="reveal active">
       <div class="eyebrow"><span class="pulse-dot"></span> Status: Web Application Security Specialist</div>
       <h1 class="title">Salam, mən <span class="accent">Ziyatay</span>.<br>Web Pentesting üzrə dərinləşən mütəxəssis.</h1>
       <p class="subtitle">
@@ -347,46 +377,48 @@
       </div>
     </div>
 
-    <!-- Terminal Box Widget -->
-    <div class="terminal-box">
-      <div class="terminal-header">
-        <div class="terminal-dots">
-          <div class="dot red"></div>
-          <div class="dot yellow"></div>
-          <div class="dot green"></div>
+    <!-- Terminal Box Widget with 3D Tilt -->
+    <div class="tilt-card reveal active">
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+          </div>
+          <div class="terminal-title">burp-suite / web-recon</div>
         </div>
-        <div class="terminal-title">burp-suite / web-recon</div>
-      </div>
-      <div class="terminal-body">
-        <div class="term-line">
-          <span class="term-prompt">ziyatay@sec:~$</span>
-          <span class="term-cmd">arjun -u https://target.app/api -m POST</span>
+        <div class="terminal-body">
+          <div class="term-line">
+            <span class="term-prompt">ziyatay@sec:~$</span>
+            <span class="term-cmd">arjun -u https://target.app/api -m POST</span>
+          </div>
+          <div class="term-output">[+] Hidden parameter found: "redirect_uri"</div>
+          <div class="term-line" style="margin-top: 12px;">
+            <span class="term-prompt">ziyatay@sec:~$</span>
+            <span class="term-cmd">curl -X POST -H "Content-Type: application/xml"</span>
+          </div>
+          <div class="term-output">
+            &lt;!DOCTYPE test [&lt;!ENTITY xxe SYSTEM "file:///flag.txt"&gt;]&gt;<br>
+            HTTP/1.1 200 OK<br>
+            Response: THM{xxe_injection_successful}
+          </div>
+          <div class="term-line" style="margin-top: 12px;">
+            <span class="term-prompt">ziyatay@sec:~$</span>
+            <span class="term-cmd">cat owasp_progress.status</span>
+          </div>
+          <div class="term-output" style="color: var(--accent-green);">[+] SSRF, XXE, SQLi, XSS & CSRF Labs Mastered!</div>
         </div>
-        <div class="term-output">[+] Hidden parameter found: "redirect_uri"</div>
-        <div class="term-line" style="margin-top: 12px;">
-          <span class="term-prompt">ziyatay@sec:~$</span>
-          <span class="term-cmd">curl -X POST -H "Content-Type: application/xml"</span>
-        </div>
-        <div class="term-output">
-          &lt;!DOCTYPE test [&lt;!ENTITY xxe SYSTEM "file:///flag.txt"&gt;]&gt;<br>
-          HTTP/1.1 200 OK<br>
-          Response: THM{xxe_injection_successful}
-        </div>
-        <div class="term-line" style="margin-top: 12px;">
-          <span class="term-prompt">ziyatay@sec:~$</span>
-          <span class="term-cmd">cat owasp_progress.status</span>
-        </div>
-        <div class="term-output" style="color: var(--accent-green);">[+] SSRF, XXE, SQLi, XSS & CSRF Labs Mastered!</div>
       </div>
     </div>
   </div>
 </header>
 
 <section id="about">
-  <div class="wrap">
+  <div class="wrap reveal">
     <div class="section-label">Haqqımda</div>
     <h2 class="section-title">Kiməm?</h2>
-    <div class="about-card">
+    <div class="about-card tilt-card">
       <p class="about-text">
         Şəbəkə əsaslarından başlayaraq diqqətimi tam olaraq <strong>Web Application Security</strong> və <strong>Pentesting</strong> sahəsinə yönəltmişəm. Özümü müstəqil şəkildə inkişaf etdirərək <strong>WEB RTA</strong> sertifikatını əldə etmişəm və <strong>eJPT</strong> imtahanına hazırlığı yekunlaşdırmışam. PortSwigger Web Security Academy üzərində intensiv təlim proqramı ilə SSRF, XXE, SQL Injection, XSS və CSRF kimi mürəkkəb veb zəifliklərinin mexanizmini və praktiki eksploitasiya metodlarını öyrənirəm.
       </p>
@@ -395,46 +427,46 @@
 </section>
 
 <section id="skills">
-  <div class="wrap">
+  <div class="wrap reveal">
     <div class="section-label">Bacarıqlar</div>
     <h2 class="section-title">Texniki Xəritə</h2>
     <div class="skill-map">
-      <div class="skill-node">
+      <div class="skill-node tilt-card">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
           <h3>Web Pentesting (OWASP)</h3>
         </div>
         <p>SSRF, XXE Injection, SQLi, Cross-Site Scripting (XSS), CSRF və Open Redirect zəifliklərinin analizi.</p>
       </div>
-      <div class="skill-node">
+      <div class="skill-node tilt-card">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
           <h3>Pentest Alətləri</h3>
         </div>
         <p>Burp Suite (Repeater, Intruder, Extensions), Arjun (Parameter Discovery), Nmap, Metasploit, OpenSSL.</p>
       </div>
-      <div class="skill-node">
+      <div class="skill-node tilt-card">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
           <h3>Reconnaissance & Discovery</h3>
         </div>
         <p>Gizli parametrlərin və subdomenlərin aşkar edilməsi, HTTP Traffic Interception və Header Manipulation.</p>
       </div>
-      <div class="skill-node">
+      <div class="skill-node tilt-card">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
           <h3>Sistem & Konteynrlər</h3>
         </div>
         <p>Linux (Kali / Ubuntu CLI), Docker Compose ilə laboratoriya mühitlərinin qurulması, Windows Server.</p>
       </div>
-      <div class="skill-node">
+      <div class="skill-node tilt-card">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
           <h3>Networking & Crypto</h3>
         </div>
         <p>TCP/IP, Subnetting, Wireshark ilə paket analizi, OpenSSL ilə fayl və məlumat şifrələmə texnikaları.</p>
       </div>
-      <div class="skill-node">
+      <div class="skill-node tilt-card">
         <div class="skill-node-header">
           <div class="skill-node-icon"></div>
           <h3>Sənədləşdirmə & Report</h3>
@@ -446,13 +478,13 @@
 </section>
 
 <section id="projects">
-  <div class="wrap">
+  <div class="wrap reveal">
     <div class="section-label">Layihələr</div>
     <h2 class="section-title">CTF & Vulnerability Write-ups</h2>
 
     <div class="project-list">
-      <!-- 01: CTF Write-up Arxivi (1-ci sıraya keçirildi) -->
-      <div class="project-card">
+      <!-- 01: CTF Write-up Arxivi -->
+      <div class="project-card tilt-card">
         <div class="project-idx">01</div>
         <div class="project-content">
           <h3>CTF Write-up Arxivi</h3>
@@ -475,7 +507,7 @@
       </div>
 
       <!-- 02: XXE Injection Lab -->
-      <div class="project-card">
+      <div class="project-card tilt-card">
         <div class="project-idx">02</div>
         <div class="project-content">
           <h3>TryHackMe — XXE Injection Lab</h3>
@@ -489,7 +521,7 @@
       </div>
 
       <!-- 03: Open Redirect Analysis -->
-      <div class="project-card">
+      <div class="project-card tilt-card">
         <div class="project-idx">03</div>
         <div class="project-content">
           <h3>NahamStore — Open Redirect Analysis</h3>
@@ -506,25 +538,25 @@
 </section>
 
 <section id="certs">
-  <div class="wrap">
+  <div class="wrap reveal">
     <div class="section-label">Sertifikatlar</div>
     <h2 class="section-title">Sertifikatlar & Hədəflər</h2>
     <div class="cert-grid">
-      <div class="cert-card">
+      <div class="cert-card tilt-card">
         <a href="https://labs.cyberwarfare.live/credential/achievement/6aa9845365159096bae36d43" target="_blank" class="cert-link">
           <div class="cert-name">WEB RTA (Certified Web Red Team Analyst) ↗</div>
         </a>
         <div class="cert-date">Eldə olunub (2026)</div>
       </div>
-      <div class="cert-card">
+      <div class="cert-card tilt-card">
         <div class="cert-name">TryHackMe — Jr Penetration Tester</div>
         <div class="cert-date">Tamamlanıb</div>
       </div>
-      <div class="cert-card">
+      <div class="cert-card tilt-card">
         <div class="cert-name">TryHackMe — CyberSecurity 101 Path</div>
         <div class="cert-date">Tamamlanıb</div>
       </div>
-      <div class="cert-card">
+      <div class="cert-card tilt-card">
         <div class="cert-name">TryHackMe — Pre Security (Legacy)</div>
         <div class="cert-date">Tamamlanıb</div>
       </div>
@@ -533,7 +565,7 @@
 </section>
 
 <footer id="contact">
-  <div class="wrap">
+  <div class="wrap reveal">
     <h2>Əlaqə Saxlayaq</h2>
     <p>Veb təhlükəsizlik layihələri, təkliflər və əməkdaşlıq üçün mənə yazın.</p>
     <div class="contact-links">
@@ -545,6 +577,83 @@
     <p class="footnote">© Ziyatay İbrahimzadə. GitHub Pages üzərində host olunur.</p>
   </div>
 </footer>
+
+<!-- INTERACTIVE SCRIPTS -->
+<script>
+  // 1. CANVAS MATRIX RAIN EFFECT
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = document.querySelector('.hero').offsetHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const chars = '01100101010101101010101010101010101010101010100100110';
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(5, 8, 17, 0.08)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#00F0FF';
+    ctx.font = fontSize + 'px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars.charAt(Math.floor(Math.random() * chars.length));
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+  setInterval(drawMatrix, 40);
+
+  // 2. 3D TILT EFFECT ON HOVER
+  const tiltCards = document.querySelectorAll('.tilt-card');
+  tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = (y - centerY) / 20;
+      const rotateY = (centerX - x) / 20;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    });
+  });
+
+  // 3. SCROLL REVEAL ANIMATION
+  function revealOnScroll() {
+    const reveals = document.querySelectorAll('.reveal');
+    const windowHeight = window.innerHeight;
+    
+    reveals.forEach(el => {
+      const elementTop = el.getBoundingClientRect().top;
+      const elementVisible = 120;
+      
+      if (elementTop < windowHeight - elementVisible) {
+        el.classList.add('active');
+      }
+    });
+  }
+  window.addEventListener('scroll', revealOnScroll);
+  revealOnScroll();
+</script>
 
 </body>
 </html>
