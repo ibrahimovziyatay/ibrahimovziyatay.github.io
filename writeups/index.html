@@ -202,55 +202,104 @@
   <div class="wrap reveal active">
     <div class="section-label">write-ups arxivi</div>
     <h1>CTF Write-up Arxivi</h1>
-    <p>TryHackMe və Hack The Box platformalarında həll etdiyim otaqların addım-addım izahlı sənədləri. Hər yazıda reconnaissance mərhələsindən Root hüquqlarının alınmasına qədər olan bütöv proses göstərilir.</p>
+    <p>NahamStore, TryHackMe və Hack The Box platformalarında həll etdiyim zəifliklərin addım-addım izahlı sənədləri.</p>
   </div>
 </header>
 
 <div class="list">
   <div class="wrap">
     
-    <!-- CARD 1 -->
-    <a class="card tilt-card reveal active" href="agent-sudo.html">
-      <div class="card-top">
-        <h2>Agent Sudo</h2>
-        <span class="diff mixed">Easy / Medium</span>
-      </div>
-      <p>HTTP User-Agent manipulyasiyası, FTP brute-force, PNG/JPG steqanoqrafiyası (binwalk, steghide, stegseek) və CVE-2019-14287 ilə sudo bypass edərək root əldə etmək.</p>
-      <div class="tags">
-        <span class="tag">Web</span>
-        <span class="tag">FTP</span>
-        <span class="tag">Steganography</span>
-        <span class="tag">CVE-2019-14287</span>
-      </div>
-    </a>
+    <!-- NAHAMSTORE WRITE-UPS -->
 
-    <!-- CARD 2 -->
-    <a class="card tilt-card reveal active" href="relevant.html">
+    <!-- OPEN REDIRECT -->
+    <a class="card tilt-card reveal active" href="open-redirect.html">
       <div class="card-top">
-        <h2>Relevant</h2>
+        <h2>NahamStore — Open Redirect</h2>
         <span class="diff mixed">Medium</span>
       </div>
-      <p>Parolsuz SMB share-dən etimadnamə oğurlanması, veb-shell yükləmə və SeImpersonatePrivilege ilə PrintSpoofer istifadə edərək SYSTEM əldə etmək.</p>
+      <p>Arjun parametr fuzzer aləti ilə gizli 'r' parametrinin aşkarlanması və Address Book bölməsində redirect_url zəifliyinin istismarı.</p>
       <div class="tags">
-        <span class="tag">SMB</span>
-        <span class="tag">IIS / ASP.NET</span>
-        <span class="tag">Webshell</span>
-        <span class="tag">Token Impersonation</span>
+        <span class="tag">Web</span>
+        <span class="tag">Arjun</span>
+        <span class="tag">Open Redirect</span>
+        <span class="tag">Phishing Risk</span>
       </div>
     </a>
 
-    <!-- CARD 3 -->
-    <a class="card tilt-card reveal active" href="kenobi.html">
+    <!-- IDOR -->
+    <a class="card tilt-card reveal active" href="idor.html">
       <div class="card-top">
-        <h2>Kenobi</h2>
-        <span class="diff">Easy</span>
+        <h2>NahamStore — IDOR Vulnerability</h2>
+        <span class="diff mixed">Medium</span>
       </div>
-      <p>SMB/NFS enumerasiyası, ProFTPD SITE COPY zəifliyi və SUID/PATH hijacking ilə root əldə etmək.</p>
+      <p>Sifariş sistemində icazə nəzarətini ötmə, user_id parametrlərinin Burp Suite ilə tutulması və URL-encode bypass texnikası.</p>
       <div class="tags">
-        <span class="tag">SMB</span>
-        <span class="tag">FTP</span>
-        <span class="tag">NFS</span>
-        <span class="tag">Privilege Escalation</span>
+        <span class="tag">Web</span>
+        <span class="tag">IDOR</span>
+        <span class="tag">Burp Suite</span>
+        <span class="tag">Bypass</span>
+      </div>
+    </a>
+
+    <!-- LFI -->
+    <a class="card tilt-card reveal active" href="lfi.html">
+      <div class="card-top">
+        <h2>NahamStore — Local File Inclusion (LFI)</h2>
+        <span class="diff mixed">Medium</span>
+      </div>
+      <p>Path Traversal sınağı, WAF süzgəcini iç-içə ..//..// ardıcıllığı ilə bypass edərək server daxilindəki flag.txt faylının oxunması.</p>
+      <div class="tags">
+        <span class="tag">Web</span>
+        <span class="tag">LFI</span>
+        <span class="tag">Path Traversal</span>
+        <span class="tag">WAF Bypass</span>
+      </div>
+    </a>
+
+    <!-- SQL INJECTION -->
+    <a class="card tilt-card reveal active" href="sqli.html">
+      <div class="card-top">
+        <h2>NahamStore — SQL Injection (Union & Blind)</h2>
+        <span class="diff mixed">Medium / Hard</span>
+      </div>
+      <p>/product?id= parametri üzərində Klassik Union-based SQLi və /returns endpoint-ində sqlmap vasitəsilə Blind SQLi istismarı.</p>
+      <div class="tags">
+        <span class="tag">Web</span>
+        <span class="tag">SQLi</span>
+        <span class="tag">Union-Based</span>
+        <span class="tag">Blind SQLi</span>
+        <span class="tag">sqlmap</span>
+      </div>
+    </a>
+
+    <!-- XSS -->
+    <a class="card tilt-card reveal active" href="xss.html">
+      <div class="card-top">
+        <h2>NahamStore — Cross-Site Scripting (XSS)</h2>
+        <span class="diff">Easy / Medium</span>
+      </div>
+      <p>Reflected və Stored XSS zəiflikləri, User-Agent header inyeksiyası, HTML taq çıxışları (title, textarea) və Arjun+Dalfox avtomatlaşdırılması.</p>
+      <div class="tags">
+        <span class="tag">Web</span>
+        <span class="tag">Reflected XSS</span>
+        <span class="tag">Stored XSS</span>
+        <span class="tag">Dalfox</span>
+        <span class="tag">Arjun</span>
+      </div>
+    </a>
+
+    <!-- XXE -->
+    <a class="card tilt-card reveal active" href="xxe.html">
+      <div class="card-top">
+        <h2>NahamStore — XML External Entity (XXE)</h2>
+        <span class="diff mixed">Medium</span>
+      </div>
+      <p>stock.nahamstore.thm sub-domenində Turbo Intruder vasitəsilə gizli 'xml' parametrinin tapılması və xarici entity ilə məxfi faylın oxunması.</p>
+      <div class="tags">
+        <span class="tag">Web</span>
+        <span class="tag">XXE</span>
+        <span class="tag">Turbo Intruder</span>
+        <span class="tag">Subdomain</span>
       </div>
     </a>
 
