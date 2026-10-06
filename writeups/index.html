@@ -1,11 +1,14 @@
+```html
 <!DOCTYPE html>
 <html lang="az">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Write-ups — Ziyatay İbrahimzadə</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --bg: #050811;
@@ -20,9 +23,16 @@
     --glow-cyan: rgba(0, 240, 255, 0.2);
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -30,305 +40,866 @@
     line-height: 1.6;
     overflow-x: hidden;
     position: relative;
-    background-image: 
-      radial-gradient(circle at 15% 15%, rgba(112, 0, 255, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 85% 65%, rgba(0, 240, 255, 0.06) 0%, transparent 45%),
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+
+    background-image:
+      radial-gradient(
+        circle at 15% 15%,
+        rgba(112, 0, 255, 0.08) 0%,
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 85% 65%,
+        rgba(0, 240, 255, 0.06) 0%,
+        transparent 45%
+      ),
+      linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 1px
+      );
+
+    background-size:
+      100% 100%,
+      100% 100%,
+      40px 40px,
+      40px 40px;
   }
 
-  h1, h2, h3, .mono { font-family: 'JetBrains Mono', monospace; }
-  a { color: var(--accent-cyan); text-decoration: none; transition: all 0.3s ease; }
-  ::selection { background: var(--accent-cyan); color: #000; }
+  h1,
+  h2,
+  h3,
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
+  a {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
 
-  /* NAV */
+  ::selection {
+    background: var(--accent-cyan);
+    color: #000;
+  }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* =========================
+     NAVIGATION
+  ========================= */
+
   nav {
-    position: sticky; top: 0; z-index: 100;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
     background: rgba(5, 8, 17, 0.85);
     backdrop-filter: blur(16px);
+
     border-bottom: 1px solid var(--panel-border);
   }
+
   nav .wrap {
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     height: 70px;
   }
+
   .logo {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
     font-size: 15px;
-    display: flex; align-items: center; gap: 8px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .logo-prompt { color: var(--accent-green); text-shadow: 0 0 8px rgba(0,255,157,0.4); }
-  .logo span { color: var(--accent-cyan); }
-  
+
+  .logo-prompt {
+    color: var(--accent-green);
+    text-shadow: 0 0 8px rgba(0, 255, 157, 0.4);
+  }
+
+  .logo span {
+    color: var(--accent-cyan);
+  }
+
   .back-link {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
+
     color: var(--muted);
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 8px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 14px;
+    border-radius: 8px;
+
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--panel-border);
+
     transition: all 0.3s ease;
   }
+
   .back-link:hover {
     color: var(--accent-cyan);
     border-color: var(--accent-cyan);
     transform: translateX(-3px);
-    box-shadow: 0 0 15px rgba(0,240,255,0.15);
+
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
   }
 
-  /* HEADER */
+  /* =========================
+     HEADER
+  ========================= */
+
   header {
     padding: 80px 0 40px;
     border-bottom: 1px solid var(--line);
   }
+
   .section-label {
     font-family: 'JetBrains Mono', monospace;
-    color: var(--accent-cyan); font-size: 12px;
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    color: var(--accent-cyan);
+    font-size: 12px;
+
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    margin-bottom: 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .section-label::before { content: '//'; color: var(--accent-green); }
-  
+
+  .section-label::before {
+    content: '//';
+    color: var(--accent-green);
+  }
+
   h1 {
     font-size: clamp(30px, 4.5vw, 42px);
     font-weight: 800;
+
     margin-bottom: 16px;
     letter-spacing: -1px;
   }
-  header p { color: var(--muted); max-width: 620px; font-size: 16px; line-height: 1.7; }
 
-  /* CARDS LIST */
-  .list { padding: 50px 0 80px; }
-  
+  header p {
+    color: var(--muted);
+    max-width: 620px;
+
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* =========================
+     CARDS
+  ========================= */
+
+  .list {
+    padding: 50px 0 80px;
+  }
+
   .tilt-card {
     transform-style: preserve-3d;
-    transition: transform 0.15s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+
+    transition:
+      transform 0.15s ease-out,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
   }
 
   .card {
     display: block;
+
     background: var(--panel);
+
     border: 1px solid var(--panel-border);
     border-radius: 16px;
+
     padding: 28px 30px;
     margin-bottom: 22px;
+
     backdrop-filter: blur(12px);
+
     position: relative;
     overflow: hidden;
   }
-  
+
   .card:hover {
     border-color: var(--accent-cyan);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 240, 255, 0.12);
+
+    box-shadow:
+      0 15px 35px rgba(0, 0, 0, 0.5),
+      0 0 25px rgba(0, 240, 255, 0.12);
   }
 
   .card-top {
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
     margin-bottom: 12px;
   }
-  
+
   .card h2 {
-    font-size: 20px; font-weight: 700; color: var(--text);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+
     transition: color 0.25s ease;
   }
-  .card:hover h2 { color: var(--accent-cyan); }
+
+  .card:hover h2 {
+    color: var(--accent-cyan);
+  }
+
+  /* =========================
+     DIFFICULTY
+  ========================= */
 
   .diff {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px; font-weight: 600;
+    font-size: 11.5px;
+    font-weight: 600;
+
     color: var(--accent-green);
+
     background: rgba(0, 255, 157, 0.08);
     border: 1px solid rgba(0, 255, 157, 0.3);
-    padding: 4px 10px; border-radius: 6px;
+
+    padding: 4px 10px;
+    border-radius: 6px;
+
     box-shadow: 0 0 10px rgba(0, 255, 157, 0.1);
+
+    white-space: nowrap;
   }
+
   .diff.mixed {
     color: var(--accent-amber);
+
     background: rgba(255, 184, 0, 0.08);
     border-color: rgba(255, 184, 0, 0.3);
+
     box-shadow: 0 0 10px rgba(255, 184, 0, 0.1);
   }
 
+  /* =========================
+     CARD DESCRIPTION
+  ========================= */
+
   .card p {
     color: var(--muted);
+
     font-size: 15px;
     line-height: 1.6;
+
     margin-bottom: 18px;
   }
 
-  .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* =========================
+     TAGS
+  ========================= */
+
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
   .tag {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; color: var(--muted);
+
+    font-size: 11px;
+    color: var(--muted);
+
     background: rgba(255, 255, 255, 0.03);
+
     border: 1px solid var(--line);
-    padding: 4px 10px; border-radius: 6px;
+
+    padding: 4px 10px;
+    border-radius: 6px;
+
     transition: all 0.25s ease;
   }
+
   .card:hover .tag {
     border-color: rgba(0, 240, 255, 0.2);
     color: var(--text);
   }
 
-  /* ANIMATION REVEAL */
+  /* =========================
+     REVEAL ANIMATION
+  ========================= */
+
   .reveal {
     opacity: 0;
+
     transform: translateY(25px);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
+
   .reveal.active {
     opacity: 1;
     transform: translateY(0);
   }
+
+  /* =========================
+     MOBILE
+  ========================= */
+
+  @media (max-width: 650px) {
+
+    nav .wrap {
+      height: auto;
+      min-height: 70px;
+
+      gap: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .logo {
+      font-size: 11px;
+    }
+
+    .back-link {
+      font-size: 11px;
+      padding: 6px 10px;
+    }
+
+    header {
+      padding: 55px 0 35px;
+    }
+
+    .card {
+      padding: 22px 20px;
+    }
+
+    .card-top {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .card h2 {
+      font-size: 18px;
+    }
+
+    .card p {
+      font-size: 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .tilt-card,
+    .reveal,
+    .card,
+    .tag,
+    .back-link {
+      transition: none;
+    }
+  }
 </style>
 </head>
+
 <body>
+
+<!-- =========================
+     NAVIGATION
+========================= -->
 
 <nav>
   <div class="wrap">
+
     <div class="logo">
-      <span class="logo-prompt">ziyatay@web-sec:~$</span> <span>cat writeups.log</span>
+      <span class="logo-prompt">ziyatay@web-sec:~$</span>
+      <span>cat writeups.log</span>
     </div>
-    <a class="back-link" href="../index.html">← Əsas səhifə</a>
+
+    <a class="back-link" href="../index.html">
+      ← Əsas səhifə
+    </a>
+
   </div>
 </nav>
 
+
+<!-- =========================
+     HEADER
+========================= -->
+
 <header>
   <div class="wrap reveal active">
-    <div class="section-label">write-ups arxivi</div>
-    <h1>CTF Write-up Arxivi</h1>
-    <p>NahamStore, TryHackMe və Hack The Box platformalarında həll etdiyim zəifliklərin addım-addım izahlı sənədləri.</p>
+
+    <div class="section-label">
+      write-ups arxivi
+    </div>
+
+    <h1>
+      CTF Write-up Arxivi
+    </h1>
+
+    <p>
+      NahamStore, TryHackMe və Hack The Box platformalarında
+      həll etdiyim zəifliklərin addım-addım izahlı sənədləri.
+    </p>
+
   </div>
 </header>
 
+
+<!-- =========================
+     WRITE-UP LIST
+========================= -->
+
 <div class="list">
+
   <div class="wrap">
-    
-    <!-- NAHAMSTORE WRITE-UPS -->
+
+
+    <!-- =========================
+         NAHAMSTORE
+    ========================== -->
+
 
     <!-- OPEN REDIRECT -->
-    <a class="card tilt-card reveal active" href="open-redirect.html">
+
+    <a class="card tilt-card reveal active"
+       href="open-redirect.html">
+
       <div class="card-top">
-        <h2>NahamStore — Open Redirect</h2>
-        <span class="diff mixed">Medium</span>
+
+        <h2>
+          NahamStore — Open Redirect
+        </h2>
+
+        <span class="diff mixed">
+          Medium
+        </span>
+
       </div>
-      <p>Arjun parametr fuzzer aləti ilə gizli 'r' parametrinin aşkarlanması və Address Book bölməsində redirect_url zəifliyinin istismarı.</p>
+
+      <p>
+        Arjun parametr fuzzer aləti ilə gizli
+        'r' parametrinin aşkarlanması və Address Book
+        bölməsində redirect_url zəifliyinin istismarı.
+      </p>
+
       <div class="tags">
+
         <span class="tag">Web</span>
         <span class="tag">Arjun</span>
         <span class="tag">Open Redirect</span>
         <span class="tag">Phishing Risk</span>
+
       </div>
+
     </a>
 
+
     <!-- IDOR -->
-    <a class="card tilt-card reveal active" href="idor.html">
+
+    <a class="card tilt-card reveal active"
+       href="idor.html">
+
       <div class="card-top">
-        <h2>NahamStore — IDOR Vulnerability</h2>
-        <span class="diff mixed">Medium</span>
+
+        <h2>
+          NahamStore — IDOR Vulnerability
+        </h2>
+
+        <span class="diff mixed">
+          Medium
+        </span>
+
       </div>
-      <p>Sifariş sistemində icazə nəzarətini ötmə, user_id parametrlərinin Burp Suite ilə tutulması və URL-encode bypass texnikası.</p>
+
+      <p>
+        Sifariş sistemində icazə nəzarətini ötmə,
+        user_id parametrlərinin Burp Suite ilə tutulması
+        və URL-encode bypass texnikası.
+      </p>
+
       <div class="tags">
+
         <span class="tag">Web</span>
         <span class="tag">IDOR</span>
         <span class="tag">Burp Suite</span>
         <span class="tag">Bypass</span>
+
       </div>
+
     </a>
 
+
     <!-- LFI -->
-    <a class="card tilt-card reveal active" href="lfi.html">
+
+    <a class="card tilt-card reveal active"
+       href="lfi.html">
+
       <div class="card-top">
-        <h2>NahamStore — Local File Inclusion (LFI)</h2>
-        <span class="diff mixed">Medium</span>
+
+        <h2>
+          NahamStore — Local File Inclusion (LFI)
+        </h2>
+
+        <span class="diff mixed">
+          Medium
+        </span>
+
       </div>
-      <p>Path Traversal sınağı, WAF süzgəcini iç-içə ..//..// ardıcıllığı ilə bypass edərək server daxilindəki flag.txt faylının oxunması.</p>
+
+      <p>
+        Path Traversal sınağı, WAF süzgəcini
+        iç-içə ..//..// ardıcıllığı ilə bypass edərək
+        server daxilindəki flag.txt faylının oxunması.
+      </p>
+
       <div class="tags">
+
         <span class="tag">Web</span>
         <span class="tag">LFI</span>
         <span class="tag">Path Traversal</span>
         <span class="tag">WAF Bypass</span>
+
       </div>
+
     </a>
 
+
     <!-- SQL INJECTION -->
-    <a class="card tilt-card reveal active" href="sqli.html">
+
+    <a class="card tilt-card reveal active"
+       href="sqli.html">
+
       <div class="card-top">
-        <h2>NahamStore — SQL Injection (Union & Blind)</h2>
-        <span class="diff mixed">Medium / Hard</span>
+
+        <h2>
+          NahamStore — SQL Injection (Union & Blind)
+        </h2>
+
+        <span class="diff mixed">
+          Medium / Hard
+        </span>
+
       </div>
-      <p>/product?id= parametri üzərində Klassik Union-based SQLi və /returns endpoint-ində sqlmap vasitəsilə Blind SQLi istismarı.</p>
+
+      <p>
+        /product?id= parametri üzərində klassik
+        Union-based SQLi və /returns endpoint-ində
+        sqlmap vasitəsilə Blind SQLi istismarı.
+      </p>
+
       <div class="tags">
+
         <span class="tag">Web</span>
         <span class="tag">SQLi</span>
         <span class="tag">Union-Based</span>
         <span class="tag">Blind SQLi</span>
         <span class="tag">sqlmap</span>
+
       </div>
+
     </a>
 
+
     <!-- XSS -->
-    <a class="card tilt-card reveal active" href="xss.html">
+
+    <a class="card tilt-card reveal active"
+       href="xss.html">
+
       <div class="card-top">
-        <h2>NahamStore — Cross-Site Scripting (XSS)</h2>
-        <span class="diff">Easy / Medium</span>
+
+        <h2>
+          NahamStore — Cross-Site Scripting (XSS)
+        </h2>
+
+        <span class="diff">
+          Easy / Medium
+        </span>
+
       </div>
-      <p>Reflected və Stored XSS zəiflikləri, User-Agent header inyeksiyası, HTML taq çıxışları (title, textarea) və Arjun+Dalfox avtomatlaşdırılması.</p>
+
+      <p>
+        Reflected və Stored XSS zəiflikləri,
+        User-Agent header inyeksiyası, HTML tag çıxışları
+        (title, textarea) və Arjun + Dalfox avtomatlaşdırılması.
+      </p>
+
       <div class="tags">
+
         <span class="tag">Web</span>
         <span class="tag">Reflected XSS</span>
         <span class="tag">Stored XSS</span>
         <span class="tag">Dalfox</span>
         <span class="tag">Arjun</span>
+
       </div>
+
     </a>
 
+
     <!-- XXE -->
-    <a class="card tilt-card reveal active" href="xxe.html">
+
+    <a class="card tilt-card reveal active"
+       href="xxe.html">
+
       <div class="card-top">
-        <h2>NahamStore — XML External Entity (XXE)</h2>
-        <span class="diff mixed">Medium</span>
+
+        <h2>
+          NahamStore — XML External Entity (XXE)
+        </h2>
+
+        <span class="diff mixed">
+          Medium
+        </span>
+
       </div>
-      <p>stock.nahamstore.thm sub-domenində Turbo Intruder vasitəsilə gizli 'xml' parametrinin tapılması və xarici entity ilə məxfi faylın oxunması.</p>
+
+      <p>
+        stock.nahamstore.thm sub-domenində Turbo Intruder
+        vasitəsilə gizli 'xml' parametrinin tapılması və
+        xarici entity ilə məxfi faylın oxunması.
+      </p>
+
       <div class="tags">
+
         <span class="tag">Web</span>
         <span class="tag">XXE</span>
         <span class="tag">Turbo Intruder</span>
         <span class="tag">Subdomain</span>
+
       </div>
+
     </a>
 
+
+    <!-- =========================
+         TRYHACKME
+    ========================== -->
+
+
+    <!-- RELEVANT -->
+
+    <a class="card tilt-card reveal active"
+       href="relevant.html">
+
+      <div class="card-top">
+
+        <h2>
+          TryHackMe — Relevant
+        </h2>
+
+        <span class="diff mixed">
+          Medium
+        </span>
+
+      </div>
+
+      <p>
+        SMB enumeration, file share analysis, web service
+        enumeration, file upload bypass və privilege
+        escalation mərhələlərinin addım-addım analizi.
+      </p>
+
+      <div class="tags">
+
+        <span class="tag">TryHackMe</span>
+        <span class="tag">SMB</span>
+        <span class="tag">Enumeration</span>
+        <span class="tag">File Upload</span>
+        <span class="tag">Privilege Escalation</span>
+
+      </div>
+
+    </a>
+
+
+    <!-- AGENT SUDO -->
+
+    <a class="card tilt-card reveal active"
+       href="agentsudo.html">
+
+      <div class="card-top">
+
+        <h2>
+          TryHackMe — Agent Sudo
+        </h2>
+
+        <span class="diff">
+          Easy
+        </span>
+
+      </div>
+
+      <p>
+        Web enumeration, User-Agent manipulation,
+        hidden directories, brute-force və privilege
+        escalation mərhələlərinin addım-addım analizi.
+      </p>
+
+      <div class="tags">
+
+        <span class="tag">TryHackMe</span>
+        <span class="tag">Enumeration</span>
+        <span class="tag">Brute Force</span>
+        <span class="tag">Linux</span>
+        <span class="tag">Privilege Escalation</span>
+
+      </div>
+
+    </a>
+
+
+    <!-- KENOBI -->
+
+    <a class="card tilt-card reveal active"
+       href="kenobi.html">
+
+      <div class="card-top">
+
+        <h2>
+          TryHackMe — Kenobi
+        </h2>
+
+        <span class="diff">
+          Easy
+        </span>
+
+      </div>
+
+      <p>
+        Nmap ilə reconnaissance, SMB/NFS enumeration,
+        ProFTPD exploitation, SSH key abuse və Linux
+        privilege escalation mərhələləri.
+      </p>
+
+      <div class="tags">
+
+        <span class="tag">TryHackMe</span>
+        <span class="tag">Nmap</span>
+        <span class="tag">SMB</span>
+        <span class="tag">ProFTPD</span>
+        <span class="tag">Privilege Escalation</span>
+
+      </div>
+
+    </a>
+
+
   </div>
+
 </div>
 
-<!-- SCRIPTS FOR 3D TILT EFFECT -->
+
+<!-- =========================
+     SCRIPTS
+========================= -->
+
 <script>
+
   const tiltCards = document.querySelectorAll('.tilt-card');
+
   tiltCards.forEach(card => {
+
     card.addEventListener('mousemove', (e) => {
+
       const rect = card.getBoundingClientRect();
+
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      
+
       const rotateX = (y - centerY) / 25;
       const rotateY = (centerX - x) / 25;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-3px)`;
+      card.style.transform =
+        `perspective(1000px)
+         rotateX(${rotateX}deg)
+         rotateY(${rotateY}deg)
+         translateY(-3px)`;
+
     });
 
+
     card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+
+      card.style.transform =
+        'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+
     });
+
   });
+
+
+  /* =========================
+     SCROLL REVEAL
+  ========================== */
+
+  const revealElements =
+    document.querySelectorAll('.reveal');
+
+  const observer =
+    new IntersectionObserver(
+      (entries) => {
+
+        entries.forEach(entry => {
+
+          if (entry.isIntersecting) {
+
+            entry.target.classList.add('active');
+
+            observer.unobserve(entry.target);
+
+          }
+
+        });
+
+      },
+      {
+        threshold: 0.08
+      }
+    );
+
+
+  revealElements.forEach(element => {
+
+    if (!element.classList.contains('active')) {
+      observer.observe(element);
+    }
+
+  });
+
 </script>
 
 </body>
 </html>
+```
