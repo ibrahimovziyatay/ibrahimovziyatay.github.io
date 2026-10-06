@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NahamStore Write-up — SQL Injection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-purple: #bc8cff;
+            --accent-green: #2ea043;
+            --code-bg: #010409;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1f242d 0%, #161b22 100%); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; margin-bottom: 25px; }
+        header h1 { color: #fff; font-size: 2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .card-title { font-size: 1.25rem; color: #fff; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .terminal { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e6edf3; margin: 12px 0; overflow-x: auto; }
+        .flag-box { background: rgba(188, 140, 255, 0.1); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 12px 16px; margin: 15px 0; display: flex; align-items: center; gap: 10px; }
+        .flag-box strong { color: var(--accent-purple); }
+        code { font-family: monospace; background: rgba(110,118,129,0.2); padding: 2px 6px; border-radius: 4px; color: #f0f6fc; }
+        ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fa-solid fa-database" style="color: var(--accent-purple)"></i> NahamStore Write-up — SQL Injection</h1>
+        <p style="color: var(--text-muted); margin-top:5px;">Klassik (union-based) və Blind SQL Injection zəifliklərinin aşkarlanması</p>
+    </header>
+
+    <div class="card">
+        <p>Bu sənəd "NahamStore" tətbiqində aşkarlanmış iki fərqli SQL Injection zəifliyinin araşdırılması prosesini əks etdirir: birincisi klassik (union-based), ikincisi isə blind SQL injection nümunəsidir[cite: 21].</p>
+    </div>
+
+    <!-- 1-ci Flag -->
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-key"></i> 1-ci Flag (Union-Based SQLi)</div>
+        <ol>
+            <li><code>/product?id='</code> sorğusu göndərildikdə server birbaşa raw MySQL sintaksis xətasını geri qaytardı[cite: 23]:
+                <div class="terminal">You have an error in your SQL syntax; check the manual... near " LIMIT 1"</div>
+            </li>
+            <li>Zəifliyi təsdiqləmək üçün <code>id=-1 union select 1,2,3,4,5--</code> payload-u istifadə olundu ("2" və "4" reflected sütunlar idi)[cite: 23].</li>
+            <li>Verilənlər bazası adını tapmaq üçün <code>id=-1 union select 1,database(),3,4,5--</code> göndərildi və bazanın adının <code>nahamstore</code> olduğu müəyyən edildi[cite: 23].</li>
+            <li>Prosesi sürətləndirmək üçün <strong>sqlmap</strong> aləti istifadə edildi[cite: 23]. <code>sqli_one</code> cədvəlindən flag çıxarıldı[cite: 24].</li>
+        </ol>
+        <div class="flag-box">
+            <strong>1-ci Flag:</strong> <code>{d890234e20be48ff96a2f9caab0de55c}</code>[cite: 24]
+        </div>
+    </div>
+
+    <!-- 2-ci Flag -->
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-eye-slash"></i> 2-ci Flag (Blind SQL Injection)</div>
+        <ol>
+            <li><code>POST /returns</code> endpoint-indəki forma sahələri (<code>order_number</code>, <code>return_reason</code>, <code>return_info</code>) araşdırıldı[cite: 24, 25].</li>
+            <li><code>order_number</code> sahəsinə <code>*</code> işarəsi qoyularaq <strong>sqlmap</strong> alətinə xüsusi bu parametr hədəf göstərildi[cite: 25]:
+                <div class="terminal">sqlmap -r request.txt -p order_number</div>
+            </li>
+            <li>Blind SQLi vasitəsilə <code>sqli_two</code> cədvəlindən ikinci flag əldə edildi[cite: 25, 26].</li>
+        </ol>
+        <div class="flag-box">
+            <strong>2-ci Flag:</strong> <code>{212ec3b036925a38b7167cf9f0243015}</code>[cite: 26]
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-shield-halved"></i> Nəticə və Tövsiyələr</div>
+        <p><strong>Nəticə:</strong> Birinci zəiflik birbaşa xəta mesajı verdiyi üçün Union-based, ikinci zəiflik isə cavabda xəta görünmədiyi üçün Blind SQL Injection idi[cite: 26].</p>
+        <p style="margin-top:10px;"><strong>Tövsiyələr:</strong> Bütün istifadəçi girişləri parametrləşdirilmiş sorğular (prepared statements) vasitəsilə emal edilməli, bazanın xəta mesajları istifadəçiyə göstərilməməlidir[cite: 26].</p>
+    </div>
+</div>
+</body>
+</html>
