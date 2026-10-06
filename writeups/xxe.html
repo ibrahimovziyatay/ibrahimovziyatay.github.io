@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NahamStore Write-up - XXE Zəifliyi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-color: #58a6ff;
+            --accent-green: #2ea043;
+            --accent-red: #f85149;
+            --code-bg: #010409;
+            --lang-en: #7ee787;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1f242d 0%, #161b22 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 i {
+            color: var(--accent-color);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .step-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .step-card:hover {
+            border-color: #484f58;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .az-text {
+            color: var(--text-main);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .en-text {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            font-style: italic;
+            background-color: rgba(110, 118, 129, 0.1);
+            padding: 8px 12px;
+            border-left: 3px solid var(--lang-en);
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 12px;
+        }
+
+        .img-container {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .img-caption {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .flag-box {
+            background: linear-gradient(90deg, rgba(46,160,67,0.15) 0%, rgba(22,27,34,1) 100%);
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .flag-box h3 {
+            color: var(--accent-green);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flag-value {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 1.4rem;
+            color: #ffffff;
+            background-color: var(--code-bg);
+            padding: 10px 18px;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px dashed var(--accent-green);
+            user-select: all;
+        }
+
+        .section-header {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin: 30px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommendations {
+            background-color: rgba(88, 166, 255, 0.05);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 12px;
+            background-color: rgba(88, 166, 255, 0.15);
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <header>
+        <span class="badge">SECURITY WRITE-UP</span>
+        <h1><i class="fa-solid fa-bug"></i> NahamStore Write-up - XXE Zəifliyi</h1>
+        <div class="subtitle">XML External Entity inyeksiyası vasitəsilə server üzərindəki fayla çıxış</div>
+        <p class="az-text">Bu sənəd "NahamStore" tətbiqinin stock sub-domenində aşkarlanmış XXE (XML External Entity) zəifliyinin araşdırılması prosesini əks etdirir. Məqsəd tətbiqin XML sənədlərini emal edən hissəsindən istifadə edərək server üzərindəki yerli fayllara (local file) çıxış əldə etməkdir.</p>
+        <div class="en-text">EN: This document describes the process of investigating an XXE (XML External Entity) vulnerability found in the stock subdomain of the "NahamStore" application. The goal is to exploit the part of the application that parses XML documents in order to read local files on the server. An English translation follows each step.</div>
+    </header>
+
+    <!-- Task Overview -->
+    <div class="step-card">
+        <div class="step-title"><i class="fa-solid fa-list-check"></i> Tapşırıq - XXE vasitəsilə flag-in tapılması</div>
+        
+        <p class="az-text">İlk növbədə bütün mövcud URL-lər statik şəkildə yoxlanıldı ki, XML faylı qəbul edən hər hansı bir endpoint və ya parametr, yəni potensial XXE zəifliyinə malik ola biləcək bir nöqtə tapılsın.</p>
+        <div class="en-text">EN: First, all available URLs were statically checked to identify any endpoint or parameter that accepts an XML file i.e., a potential point vulnerable to XXE.</div>
+
+        <p class="az-text"><strong>nahamstore.thm</strong> domenindəki bütün sorğular təhlil edildi, lakin maraqlı heç nə tapılmadı.</p>
+        <div class="en-text">EN: All requests on the nahamstore.thm domain were analyzed, but nothing of interest was found.</div>
+
+        <p class="az-text">Ona görə də <strong>gobuster</strong> aləti ilə XML faylı qəbul edən endpoint və ya parametr adları üçün brute-force axtarışı aparıldı, lakin bu domendə XML-ə aid heç bir nəticə əldə olunmadı.</p>
+        <div class="en-text">EN: Therefore, a brute-force search was carried out using gobuster for endpoints or parameter names accepting XML files, but no XML-related result was found on this domain.</div>
+
+        <p class="az-text">Bu nəticəyə əsasən qənaətə gəlindi ki, əsas domendə klassik XXE inyeksiyası mövcud deyil.</p>
+        <div class="en-text">EN: Based on this result, it was concluded that the main domain does not contain a classic XXE injection point.</div>
+
+        <p class="az-text">Bundan sonra <strong>stock.nahamstore.thm</strong> sub-domeninə keçildi.</p>
+        <div class="en-text">EN: Next, the investigation moved to the stock.nahamstore.thm subdomain.</div>
+    </div>
+
+    <!-- Step 1: Recon & Subdomain Analysis -->
+    <div class="step-card">
+        <div class="step-title"><i class="fa-solid fa-network-wired"></i> Sub-domen Analizi və İlk İlkin Sorğular</div>
+        
+        <p class="az-text"><strong>stock.nahamstore.thm</strong> sub-domeninə göndərilən ilkin GET sorğusunda XML formatına aid işarələr aşkarlandı — bu, sorğunun daha ətraflı təhlilə dəyər olduğunu göstərdi.</p>
+        <div class="en-text">EN: In the requests sent to this subdomain, indications of XML format were noticed suggesting that this request was worth a closer analysis.</div>
+
+        <p class="az-text">Sorğunun metodu GET-dən POST-a dəyişdirildi və serverin bu sorğunu qəbul etdiyi müşahidə olundu — bu, prosesin doğru istiqamətdə getdiyini göstərən yaxşı bir işarə idi.</p>
+        <div class="en-text">EN: The request method was changed from GET to POST, and it was observed that the server accepted this request a good sign that the process was heading in the right direction.</div>
+
+        <div class="img-container">
+            <p class="az-text"><strong>Şəkil 1:</strong> stock.nahamstore.thm sub-domeninə göndərilən ilkin GET sorğusu.</p>
+            <p class="az-text"><strong>Şəkil 2:</strong> POST sorğusuna verilən cavab: server "Missing header X-Token" mesajı ilə gizli bir başlığın (header) tələb olunduğunu bildirir.</p>
+        </div>
+    </div>
+
+    <!-- Step 2: Hidden Parameter Discovery -->
+    <div class="step-card">
+        <div class="step-title"><i class="fa-solid fa-magnifying-glass"></i> Gizli Parametrin Aşkarlanması (Turbo Intruder)</div>
+
+        <p class="az-text">Bu mərhələdə məqsəd sorğu daxilində gizli qalan bir parametri (hidden parameter) tapmaq idi.</p>
+        <div class="en-text">EN: At this stage, the goal was to find a hidden parameter within the request.</div>
+
+        <p class="az-text">Bunun üçün Burp Suite-in <strong>Turbo Intruder</strong> əlavəsindən (extension) istifadə edildi.</p>
+        <div class="en-text">EN: For this purpose, Burp Suite's Turbo Intruder extension was used.</div>
+
+        <p class="az-text">Brute-force ediləcək yer Turbo Intruder-də <code>%s</code> işarəsi ilə qeyd edildi.</p>
+        <div class="en-text">EN: The position to be brute-forced was marked in Turbo Intruder using the "%s" placeholder.</div>
+
+        <p class="az-text">Bütün tənzimləmələr tamamlandıqdan sonra Attack düyməsinə basılaraq brute-force prosesi başladıldı.</p>
+        <div class="en-text">EN: After all settings were configured, the brute-force process was started by clicking the Attack button.</div>
+
+        <p class="az-text">Nəticədə sorğu daxilində istifadə olunan gizli bir <strong>xml</strong> parametri aşkarlandı.</p>
+        <div class="en-text">EN: As a result, a hidden xml parameter used within the request was discovered.</div>
+
+        <div class="img-container">
+            <p class="az-text"><strong>Şəkil 3:</strong> Turbo Intruder nəticələri: "xml" adlı parametr digərlərindən fərqli status kodu (400 Bad Request "Invalid XML supplied") qaytardı, bu da onun mövcudluğunu təsdiqlədi.</p>
+        </div>
+    </div>
+
+    <!-- Step 3: Exploitation -->
+    <div class="step-card">
+        <div class="step-title"><i class="fa-solid fa-terminal"></i> Exploitation: XXE Payload Göndərilməsi</div>
+
+        <p class="az-text">İndi isə sorğuya XXE payload-u əlavə edildi ki, server tərəfindəki yerli fayllara çıxış əldə edilsin.</p>
+        <div class="en-text">EN: Next, an XXE payload was added to the request in order to gain access to local files on the server.</div>
+
+        <div class="img-container">
+            <p class="az-text"><strong>Şəkil 4:</strong> Sorğuya əlavə edilmiş XXE payload: xarici entity (ENTITY) <code>file:///flag.txt</code> faylına işarə edir və <code>&xxe;</code> ifadəsi vasitəsilə cavabın daxilində çağırılır.</p>
+        </div>
+
+        <p class="az-text">Bu payload göndərildikdə nəticədə yenə də "X-Token is missing" mesajı alındı, ona görə də payload-dakı <code>&lt;error&gt;</code> teqi əvəzinə <code>&lt;X-Token&gt;</code> teqi istifadə edildi.</p>
+        <div class="en-text">EN: When this payload was sent, the response again returned the message "X-Token is missing", so the &lt;error&gt; tag in the payload was replaced with an &lt;X-Token&gt; tag instead.</div>
+
+        <div class="img-container">
+            <p class="az-text"><strong>Şəkil 5:</strong> Yenilənmiş payload (<code>&lt;X-Token&gt;</code> teqi ilə) və serverin cavabı: flag.txt faylının məzmunu "X-Token" başlığının dəyəri kimi geri qaytarılır.</p>
+        </div>
+
+        <p class="az-text">Bu düzəlişdən sonra server <code>flag.txt</code> faylının məzmununu cavab daxilində geri qaytardı, beləliklə flag uğurla oxundu.</p>
+        <div class="en-text">EN: After this correction, the server returned the contents of the flag.txt file within the response the flag was successfully read.</div>
+    </div>
+
+    <!-- Flag Section -->
+    <div class="flag-box">
+        <h3><i class="fa-solid fa-key"></i> Əldə Olunmuş Flag</h3>
+        <div class="flag-value">9f18bd8b9acaada53c4c643744401ea8</div>
+    </div>
+
+    <!-- Technical Vulnerability Summary -->
+    <div class="step-card">
+        <p class="az-text">Bu hücum klassik bir XXE (XML External Entity) zəifliyinin nümunəsi idi: server istifadəçidən gələn XML sənədindəki xarici entity elanlarını (DOCTYPE / ENTITY) məhdudiyyətsiz şəkildə emal etdiyi üçün, server üzərindəki istənilən yerli fayl (bu halda flag.txt) oxuna bildi.</p>
+        <div class="en-text">EN: This attack was a classic example of an XXE (XML External Entity) vulnerability: because the server processed external entity declarations (DOCTYPE/ENTITY) in user-supplied XML without restriction, any local file on the server (in this case, flag.txt) could be read.</div>
+    </div>
+
+    <!-- Summary & Recommendations -->
+    <h2 class="section-header"><i class="fa-solid fa-shield-halved"></i> Nəticə və Tövsiyələr</h2>
+    
+    <div class="step-card">
+        <p class="az-text"><strong>Nəticə:</strong> Bu tapşırıqda aşkarlanan zəiflik XXE (XML External Entity) inyeksiyasıdır. Zəiflik əsas domendə deyil, ayrıca bir sub-domendəki (<code>stock.nahamstore.thm</code>) gizli bir parametrdə (<code>xml</code>) yerləşirdi və yalnız məqsədyönlü parametr axtarışı (Turbo Intruder ilə brute-force) nəticəsində aşkarlana bildi. Serverin XML parserinin xarici entity elanlarına icazə verməsi istifadəçiyə server üzərindəki istənilən yerli faylı (o cümlədən həssas fayllar) oxumağa imkan yaratdı.</p>
+        <div class="en-text">EN: The vulnerability identified in this task is an XXE (XML External Entity) injection. The flaw was not on the main domain but in a hidden parameter (xml) on a separate subdomain (stock.nahamstore.thm), and it could only be discovered through targeted parameter discovery (brute-forcing with Turbo Intruder). Because the server's XML parser allowed external entity declarations, an attacker could read any local file on the server, including sensitive files.</div>
+
+        <div class="recommendations">
+            <p class="az-text"><strong>Tövsiyələr:</strong></p>
+            <ul>
+                <li class="az-text">XML parserlərində xarici entity (external entity) və DOCTYPE elanlarının emalı tamamilə söndürülməlidir (disable DTD processing).</li>
+                <li class="az-text">Mümkün olduqda XML əvəzinə JSON kimi daha təhlükəsiz format istifadə edilməlidir.</li>
+                <li class="az-text">Bütün sub-domenlər və gizli parametrlər də əsas tətbiq qədər ciddi təhlükəsizlik testindən keçirilməlidir.</li>
+            </ul>
+            <div class="en-text">EN: Recommendations: XML parsers should have external entity and DOCTYPE processing completely disabled; a safer format such as JSON should be used instead of XML where possible; and all subdomains and hidden parameters should undergo the same rigorous security testing as the main application.</div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
