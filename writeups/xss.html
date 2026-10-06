@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NahamStore Write-up - XSS Zəiflikləri</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-color: #58a6ff;
+            --accent-green: #2ea043;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+            --code-bg: #010409;
+            --terminal-border: #21262d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1f242d 0%, #161b22 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 i {
+            color: var(--accent-orange);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 12px;
+            background-color: rgba(210, 153, 34, 0.15);
+            color: var(--accent-orange);
+            margin-bottom: 12px;
+            border: 1px solid rgba(210, 153, 34, 0.3);
+        }
+
+        .q-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .q-card:hover {
+            border-color: #484f58;
+        }
+
+        .q-number {
+            font-size: 1.2rem;
+            color: #ffffff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .q-question {
+            font-size: 0.95rem;
+            color: var(--accent-color);
+            background-color: rgba(88, 166, 255, 0.08);
+            padding: 10px 14px;
+            border-left: 3px solid var(--accent-color);
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 0.98rem;
+        }
+
+        .answer-box {
+            background-color: rgba(46, 160, 67, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .answer-box strong {
+            color: var(--accent-green);
+            font-size: 1rem;
+        }
+
+        .answer-value {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            background-color: var(--code-bg);
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Terminal Window Component */
+        .terminal-window {
+            background-color: var(--code-bg);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            margin: 18px 0;
+            overflow: hidden;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .terminal-header {
+            background-color: #161b22;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-red { background-color: #ff5f56; }
+        .dot-yellow { background-color: #ffbd2e; }
+        .dot-green { background-color: #27c93f; }
+
+        .terminal-body {
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e6edf3;
+            overflow-x: auto;
+        }
+
+        .prompt { color: var(--accent-green); font-weight: bold; }
+        .command { color: #ffffff; font-weight: bold; }
+        .output { color: var(--text-muted); }
+        .poc-trigger { color: var(--accent-orange); font-weight: bold; }
+
+        .section-header {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin: 35px 0 18px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            background-color: rgba(110, 118, 129, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #f0f6fc;
+        }
+
+        .summary-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <span class="badge"><i class="fa-solid fa-bug"></i> SECURITY WRITE-UP</span>
+        <h1><i class="fa-solid fa-code"></i> NahamStore Write-up</h1>
+        <div class="subtitle">Task 4 — Cross-Site Scripting (XSS) Zəifliklərinin Aşkarlanması</div>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Bu sənəddə NahamStore tətbiqi üzərində aşkar olunmuş Reflected və Stored XSS zəifliklərinin manual kəşfiyyat addımları və Arjun + Dalfox alətləri ilə avtomatlaşdırılması təhlil olunur.</p>
+    </header>
+
+    <!-- Question 1 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-magnifying-glass"></i> 1. Reflected XSS Endpoint-i</div>
+        <div class="q-question">Sual: XSS-ə qarşı həssas olan endpoint-in parametrlərlə birlikdə URL-ini qeyd edin.</div>
+        <ol>
+            <li><code>marketing.nahamstore.thm</code> alt domenində reflected (əks olunan) tipli XSS zəifliyi araşdırıldı.</li>
+            <li>Səhifədə bir login forması aşkar edildi. Test məqsədilə <code>test123</code> istifadəçi adı və <code>test123@123</code> e-poçt ünvanı ilə giriş cəhdi edildi, lakin heç bir nəticə alınmadı.</li>
+            <li>Ünvan sətrində URL-encode edilmiş bir sətir müşahidə olundu. Sistemin bu dəyərə necə reaksiya verdiyini öyrənmək üçün həmin sətir təsadüfi simvollarla dəyişdirildi.</li>
+            <li>Dəyişiklikdən sonra səhifənin cavabında <code>error</code> adlı bir parametrin qaytarıldığı müşahidə edildi.</li>
+            <li>Bu parametrin XSS-ə qarşı həssas ola biləcəyi ehtimal edildiyi üçün <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> payload-u həmin parametrə yerləşdirildi.</li>
+            <li>Nəticədə brauzerdə "1" mesajı olan alert pəncərəsi çıxdı, bu da endpoint-in XSS zəifliyinə malik olduğunu təsdiqlədi.</li>
+        </ol>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-heading"></i> 2. Stored XSS yaradan HTTP Başlığı</div>
+        <div class="q-question">Sual: Stored (saxlanılan) XSS yaratmaq üçün hansı HTTP başlığından istifadə oluna bilər?</div>
+        <ol>
+            <li><code>nahamstore.thm</code> əsas səhifəsinə keçid edildi.</li>
+            <li>İstənilən e-poçt və parol ilə qeydiyyatdan keçildi, ardından sistemə daxil olunaraq "Address Book" bölməsinə keçildi.</li>
+            <li>Bu bölmədəki forma dolduruldu və yeni bir ünvan yaradıldı.</li>
+            <li>"Item" bölməsinə keçilərək yaradılmış ünvana baxıldı. Ünvana klikləndikdə səhifədə <code>User-Agent</code> HTTP başlığının əks olunduğu görüldü.</li>
+            <li>Burp Suite vasitəsilə HTTP sorğusu tutuldu və <code>User-Agent</code> başlığına sadə bir XSS payload-u yerləşdirildi. Test uğurlu oldu və payload icra olundu.</li>
+        </ol>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">User-Agent</span>
+        </div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-code"></i> 3. Məhsul Səhifəsində HTML Taqı</div>
+        <div class="q-question">Sual: Məhsul səhifəsində XSS-in icra olunması üçün hansı HTML taqının escape edilməsi lazımdır?</div>
+        <ol>
+            <li>Əsas səhifədən istənilən məhsulun səhifəsinə keçid edildi.</li>
+            <li>URL-də <code>name</code> parametrinin ötürüldüyü müşahidə olundu.</li>
+            <li>Bu parametrə <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> payload-u əlavə edildi, lakin script icra olunmadı.</li>
+            <li>Səbəbi müəyyən etmək və bypass yolunu tapmaq üçün brauzerin "Inspect" funksiyasından istifadə edildi.</li>
+            <li>Aşkar edildi ki, daxil edilən mətn <code>&lt;title&gt;</code> taqının içərisinə yazıldığı üçün script icra oluna bilmir.</li>
+            <li>Bunu keçmək üçün payload-un əvvəlinə <code>&lt;/title&gt;</code> əlavə edilərək taq bağlandı və alert pəncərəsi çıxdı.</li>
+        </ol>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">title</span>
+        </div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-brands fa-js"></i> 4. JavaScript Dəyişəni</div>
+        <div class="q-question">Sual: XSS-in icra olunması üçün hansı JavaScript dəyişəninin escape edilməsi lazımdır?</div>
+        <ol>
+            <li>Əsas səhifədə yerləşən məhsul axtarış (search) sahəsindən istifadə edilərək müxtəlif dəyərlər daxil edildi və sistemin reaksiyası izlənildi.</li>
+            <li>Daxil edilən dəyərin <code>search</code> adlı parametr vasitəsilə ötürüldüyü müəyyən edildi.</li>
+        </ol>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">search</span>
+        </div>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-eye-slash"></i> 5. Əsas Səhifədə Gizli Parametr</div>
+        <div class="q-question">Sual: Mağazanın əsas səhifəsində XSS zəifliyi yaradan gizli parametr hansıdır?</div>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">q</span>
+        </div>
+    </div>
+
+    <!-- Question 6 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-rotate-left"></i> 6. Returns Səhifəsində HTML Taqı</div>
+        <div class="q-question">Sual: Returns (geri qaytarma) səhifəsində XSS-in icra olunması üçün hansı HTML taqının escape edilməsi lazımdır?</div>
+        <ol>
+            <li>"Returns" səhifəsinə keçid edildi.</li>
+            <li>"Orders" bölməsində sifariş nömrəsi daxil edildi.</li>
+            <li>Səhifədə "Return Information" adlı sahə aşkar edildi və <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> sınandı, lakin işləmədi.</li>
+            <li>"Inspect" vasitəsilə daxil edilən mətnin <code>&lt;textarea&gt;</code> taqının daxilində olduğu müəyyən edildi.</li>
+            <li>Bunu keçmək üçün <code>&lt;/textarea&gt;</code> əlavə edilərək taq bağlandı və alert pəncərəsi icra olundu.</li>
+        </ol>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">textarea</span>
+        </div>
+    </div>
+
+    <!-- Question 7 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-link"></i> 7. Səhifənin H1 Taqının Dəyəri</div>
+        <div class="q-question">Sual: Sorğu edilən URL-i istifadə edərək XSS yaradan səhifənin H1 taqının dəyəri nədir?</div>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">page not found</span>
+        </div>
+    </div>
+
+    <!-- Question 8 -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-percent"></i> 8. Mağazada Digər Gizli Parametr</div>
+        <div class="q-question">Sual: Mağazada XSS zəifliyi yarada biləcək digər gizli parametr hansıdır?</div>
+        <div class="answer-box">
+            <strong>Cavab:</strong>
+            <span class="answer-value">discount</span>
+        </div>
+    </div>
+
+    <!-- Vulnerability Summary -->
+    <h2 class="section-header"><i class="fa-solid fa-shield-halved"></i> Ümumi Nəticə</h2>
+    <div class="summary-card">
+        <p>NahamStore platforması üzərində aparılan test zamanı çoxsaylı Cross-Site Scripting (XSS) zəiflikləri aşkar edilmişdir. Zəifliklər həm reflected, həm də stored formada özünü göstərmişdir: <code>error</code>, <code>search</code>, <code>q</code> və <code>discount</code> kimi URL parametrləri, eləcə də <code>User-Agent</code> HTTP başlığı istifadəçi tərəfindən idarə oluna bilən və server tərəfindən lazımınca təmizlənməyən (sanitize edilməyən) giriş nöqtələri olmuşdur. Bundan əlavə, <code>title</code> və <code>textarea</code> HTML taqlarının düzgün escape edilməməsi payload-un müvafiq taqı bağlayaraq (<code>&lt;/title&gt;</code>, <code>&lt;/textarea&gt;</code>) icra sahəsindən çıxmasına və zərərli JavaScript kodunun işə düşməsinə imkan yaratmışdır. Bu, tətbiqin istifadəçi girişini kontekstə uyğun şəkildə kodlaşdırmadığını (context-aware output encoding) və bunun nəticəsində sessiya oğurluğu, fişinq və digər client-side hücumlara açıq olduğunu göstərir.</p>
+    </div>
+
+    <!-- Automation Section -->
+    <h2 class="section-header"><i class="fa-solid fa-robot"></i> Avtomatlaşdırılmış alətlərlə (Arjun + Dalfox) XSS Aşkarlanması</h2>
+    
+    <div class="summary-card" style="margin-bottom: 25px;">
+        <p>Yuxarıdakı zəifliklər əl ilə (manual) test zamanı tapılsa da, oxşar parametrlər eyni prosesi <strong>Arjun</strong> və <strong>Dalfox</strong> alətlərinin birgə istifadəsi ilə avtomatik şəkildə də aşkar etmək mümkündür:</p>
+        <ul style="margin-left: 20px; margin-top: 10px;">
+            <li><strong>Arjun:</strong> Endpoint-də gizli, sənədləşdirilməmiş HTTP parametrlərini (GET/POST) brute-force üsulu ilə tapan alətdir. Yuxarıdakı <code>q</code> və <code>discount</code> kimi gizli parametrlər bu alətlə aşkarlanır.</li>
+            <li><strong>Dalfox:</strong> Tapılmış parametrləri avtomatik olaraq müxtəlif XSS payload-ları ilə sınayan, əks olunma nöqtəsini (reflection) təhlil edən və real XSS zəifliyini təsdiqləyən skanerdir.</li>
+        </ul>
+    </div>
+
+    <!-- Terminal Steps -->
+    <div class="q-card">
+        <div class="q-number"><i class="fa-solid fa-terminal"></i> Nümunə: Mağazanın Əsas Səhifəsi Üzərində Tətbiq</div>
+        
+        <p style="margin-bottom: 8px;"><strong>Addım 1: Arjun ilə gizli parametrlərin tapılması</strong></p>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 10px;">Bu əmr saytın əsas səhifəsinə yüzlərlə mümkün parametr adı ilə sorğu göndərir və serverin cavabında dəyişiklik yaradan parametrləri (məsələn, <code>q</code> və <code>discount</code>) aşkar edərək nəticəni fayla yazır.</p>
+        
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                <span>bash - Arjun Parameter Discovery</span>
+            </div>
+            <div class="terminal-body">
+                <span class="prompt">user@kali:~$</span> <span class="command">arjun -u http://nahamstore.thm/ -oT arjun_params.txt</span><br>
+                <span class="output">[+] Scanning http://nahamstore.thm/ ...</span><br>
+                <span class="output">[+] Found parameter: q</span><br>
+                <span class="output">[+] Found parameter: discount</span><br>
+                <span class="output">[+] Saved results to arjun_params.txt</span>
+            </div>
+        </div>
+
+        <p style="margin-bottom: 8px; margin-top: 20px;"><strong>Addım 2: Tapılan parametrləri Dalfox-a ötürərək XSS skan etmək</strong></p>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 10px;">Dalfox hər bir parametrə ardıcıl olaraq müxtəlif XSS payload-ları yerləşdirir, cavab HTML-ində bu payload-un necə əks olunduğunu analiz edir və avtomatik olaraq işləyən (verified) XSS zəifliyini bildirir.</p>
+
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                <span>bash - Dalfox XSS Scanner</span>
+            </div>
+            <div class="terminal-body">
+                <span class="prompt">user@kali:~$</span> <span class="command">dalfox url "http://nahamstore.thm/?q=FUZZ&discount=FUZZ" --deep-domxss</span><br>
+                <span class="output">[*] Injected payloads into query parameters...</span><br>
+                <span class="poc-trigger">[POC] [GET] http://nahamstore.thm/?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E&discount=1 Triggered</span>
+            </div>
+        </div>
+
+        <p style="margin-top: 15px; font-size: 0.95rem;">Beləliklə, <strong>Arjun</strong> gizli parametrləri aşkar edən "kəşfiyyat" mərhələsini, <strong>Dalfox</strong> isə tapılan parametrlərin real şəkildə istismar oluna bilən (exploitable) XSS zəifliyi olub-olmadığını yoxlayan "doğrulama" mərhələsini avtomatlaşdıraraq analizin müddətini dəqiqələrə endirir.</p>
+    </div>
+
+</div>
+
+</body>
+</html>
