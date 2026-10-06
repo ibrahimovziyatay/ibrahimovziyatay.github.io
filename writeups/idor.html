@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NahamStore Write-up - IDOR Zəifliyi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-green: #2ea043;
+            --accent-blue: #58a6ff;
+            --code-bg: #010409;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1f242d 0%, #161b22 100%); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; margin-bottom: 25px; }
+        header h1 { color: #fff; font-size: 2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .card-title { font-size: 1.25rem; color: #fff; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .terminal { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e6edf3; margin: 12px 0; white-space: pre-wrap; }
+        .answer-box { background: rgba(46,160,67,0.1); border: 1px solid var(--accent-green); border-radius: 6px; padding: 12px; margin-top: 15px; display: flex; align-items: center; gap: 10px; }
+        .answer-box strong { color: var(--accent-green); }
+        .en-text { color: var(--text-muted); font-size: 0.9rem; font-style: italic; border-left: 2px solid var(--accent-blue); padding-left: 10px; margin-bottom: 10px; }
+        code { font-family: monospace; background: rgba(110,118,129,0.2); padding: 2px 6px; border-radius: 4px; color: #f0f6fc; }
+        ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fa-solid fa-user-shield" style="color: var(--accent-blue)"></i> NahamStore Write-up — IDOR Zəifliyi</h1>
+        <p style="color: var(--text-muted); margin-top:5px;">Sifariş sistemində icazə nəzarətinin ötürülməsi üzrə addım-addım analiz</p>
+    </header>
+
+    <div class="card">
+        <p>Bu sənəd "NahamStore" tətbiqi üzərində aparılmış IDOR (Insecure Direct Object Reference) zəifliyinin araşdırılması prosesini əks etdirir[cite: 11]. Məqsəd sistemdəki icazə nəzarəti mexanizmini ötərək başqa istifadəçilərə aid sifariş məlumatlarına (ünvan, tarix və s.) çıxış əldə etməkdir[cite: 11].</p>
+        <div class="en-text" style="margin-top:10px;">EN: This document describes the process of investigating an IDOR vulnerability in the "NahamStore" application.</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-location-crosshairs"></i> Tapşırıq 1 - Nyu-Yorkdakı istifadəçinin ünvanının birinci sətrini tapmaq</div>
+        <ol>
+            <li>Hədəf sistemin IP ünvanı <code>/etc/hosts</code> faylına əlavə edildikdən sonra <code>nahamstore.thm</code> domeni brauzerdə açıldı[cite: 11].</li>
+            <li>Əsas məqsəd tətbiq daxilində <code>id</code> və ya rəqəm parametri qəbul edən bir URL tapmaq idi[cite: 11].</li>
+            <li>Nəticədə <code>http://nahamstore.thm/product?id=2</code> ünvanı tapıldı, lakin buradan faydalı nəticə alınmadı[cite: 11].</li>
+            <li>Səbətə məhsul əlavə edildi, hesab qeydiyyatdan keçirildi, çatdırılma ünvanı təyin olundu və ödəniş tamamlandı[cite: 11, 12].</li>
+            <li>Ödənişdən sonra sifarişin PDF qəbzini yükləmək imkanı yarandı və sifariş ID-sinin 5-dən başladığı müşahidə olundu (gizli 0, 1, 2, 3 ID-lərinə işarə idi)[cite: 12].</li>
+            <li>PDF yaradılarkən Burp Suite vasitəsilə tutulan sorğuda <code>what=order&id=5</code> parametrinin ötürüldüyü görüldü[cite: 12, 13].</li>
+            <li> Sorğudakı `id=7` edildikdə *"Order does not belong to this user_id"* xəbərdarlığı alındı[cite: 13]. Bu, serverdə gizli `user_id` parametrinin olduğunu bildirdi[cite: 13].</li>
+            <li>Sorğuya manual olaraq <code>what=order&id=7&user_id=7</code> əlavə edildikdə PDF uğurla açıldı[cite: 13, 14].</li>
+        </ol>
+        <div class="answer-box">
+            <strong>Cavab:</strong> <code>160 Broadway</code>[cite: 14]
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-clock"></i> Tapşırıq 2 - Sifariş ID 3-ün tarixi və vaxtı</div>
+        <ol>
+            <li>Bu dəfə <code>user_id=3</code> olan sifariş axtarılmalı idi[cite: 14].</li>
+            <li><code>what=order&id=3&user_id=3</code> göndərildikdə yenidən imtina alındı (sərt yoxlama)[cite: 14, 15].</li>
+            <li>Bu yoxlamanı bypass etmək üçün parametr URL-encode edildi: <code>what=order&id=3%26user_id%3d3</code>[cite: 15].</li>
+            <li>Server parametrləri düzgün süzgəcdən keçirmədiyi üçün tənzimlənmiş sorğu süzgəci ötdü və PDF açıldı[cite: 15, 16].</li>
+        </ol>
+        <div class="answer-box">
+            <strong>Cavab:</strong> <code>22/02/2021 11:42:13</code>[cite: 16]
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-shield-halved"></i> Nəticə və Tövsiyələr</div>
+        <p><strong>Nəticə:</strong> Tətbiq sifariş ID-sini yoxlayarkən əlaqəli user_id dəyərini düzgün təsdiqləmirdi[cite: 16]. Server tərəfindəki filtr sadə hallarda işlədiyi üçün parametrləri URL-encode etməklə asanlıqla ötürülə bildi[cite: 16].</p>
+        <p style="margin-top:10px;"><strong>Tövsiyələr:</strong> Hər sorğuda obyektə çıxışın sessiyadakı autentifikasiya olunmuş istifadəçiyə aid olub-olmadığı server tərəfində mütləq yoxlanılmalıdır[cite: 16].</p>
+    </div>
+</div>
+</body>
+</html>
