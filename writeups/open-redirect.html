@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NahamStore Write-up - Open Redirect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-yellow: #d29922;
+            --accent-blue: #58a6ff;
+            --code-bg: #010409;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1f242d 0%, #161b22 100%); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; margin-bottom: 25px; }
+        header h1 { color: #fff; font-size: 2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .meta-item { font-size: 0.9rem; }
+        .meta-item strong { color: var(--accent-blue); display: block; font-size: 0.75rem; text-transform: uppercase; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .card-title { font-size: 1.25rem; color: #fff; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .terminal { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 14px; font-family: monospace; font-size: 0.88rem; color: #e6edf3; margin: 12px 0; overflow-x: auto; }
+        .badge-medium { background-color: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(210, 153, 34, 0.4); }
+        code { font-family: monospace; background: rgba(110,118,129,0.2); padding: 2px 6px; border-radius: 4px; color: #f0f6fc; }
+        ul { margin-left: 20px; margin-top: 10px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fa-solid fa-arrow-right-arrow-left" style="color: var(--accent-yellow)"></i> NahamStore - Open Redirect Write-Up</h1>
+        <div class="subtitle" style="color: var(--text-muted)">Penetration Testing & Vulnerability Assessment Report</div>
+        <div class="meta-grid">
+            <div class="meta-item"><strong>Hədəf Tətbiq</strong>nahamstore.thm</div>
+            <div class="meta-item"><strong>Zəiflik Növü</strong>Open Redirect</div>
+            <div class="meta-item"><strong>Təhlükə Səviyyəsi</strong><span class="badge-medium">Medium</span></div>
+            <div class="meta-item"><strong>Təhlil Metodu</strong>Param Fuzzing & PoC</div>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-circle-info"></i> 1. Giriş və Təhlil İcmalı</div>
+        <p>Bu təhlükəsizlik hesabatı NahamStore hədəf veb-tətbiqində həyata keçirdiyim sınaqlar zamanı aşkarladığım iki fərqli Open Redirect (Açıq Yönləndirmə) zəifliyini əks etdirir[cite: 8]. Open Redirect zəifliyi tətbiqin istifadəçidən aldığı URL parametrlərini lazımi sanitizasiya və validation (doğrulama) mərhələsindən keçirmədən xarici keçidlərə yönləndirməsi nəticəsində yaranır[cite: 8]. Bu zəiflik istifadəçiləri fişinq (phishing) hücumlarına məruz qoymaq üçün istifadə edilə bilər[cite: 8].</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-terminal"></i> 2. Open Redirect #1: Arjun Tool ilə Gizli Parameter Analizi</div>
+        <p>Ana səhifədə HTTP sorğusu vasitəsilə qəbul edilən gizli parametrləri aşkar etmək üçün <strong>Arjun</strong> parametr fuzzer alətindən istifadə etdim[cite: 8].</p>
+        
+        <p style="margin-top:12px;"><strong>Addım 1: Parametrlərin Skan Olunması (Discovery)</strong></p>
+        <div class="terminal">user@kali:~$ arjun -u http://nahamstore.thm/
+[*] Scanning 0/1: http://nahamstore.thm/
+[*] Probing the target for stability
+[*] Analysing HTTP response for anomalies
+[+] Extracted 1 parameter from response for testing: q
+[*] Logicforcing the URL endpoint
+[✔] parameter detected: q, based on: body length
+[✔] parameter detected: r, based on: http code
+[+] Parameters found: q, r</div>
+
+        <p style="margin-top:12px;"><strong>Addım 2: Zəifliyin Yoxlanılması və İstismarı (Exploitation)</strong></p>
+        <ul>
+            <li><code>q</code> parametrini sınaqdan keçirdim, lakin heç bir yönləndirmə davranışı müşahidə olunmadı[cite: 8].</li>
+            <li><code>r</code> parametrini kənar URL ilə test etdim: <code>http://nahamstore.thm/?r=http://www.google.com</code>[cite: 8]</li>
+            <li>Sorğunu göndərdikdə tətbiq istifadəçini birbaşa xarici <code>google.com</code> saytına yönləndirdi[cite: 8].</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-map-location-dot"></i> 3. Open Redirect #2: Əlavə Ünvan Bölməsində Yönləndirmə</div>
+        <p>İkinci zəifliyi tətbiqin daxili funksionallığını istifadəçi alış-veriş və ünvan əlavəetmə (Address Book) prosesini təhlil edərkən tapdım[cite: 9].</p>
+        <p style="margin-top:10px;"><strong>Addım 1: İstifadəçi Axını və Parametrin Təyini</strong></p>
+        <p>Ana səhifədən istənilən bir məhsul seçib səbətə əlavə etdim (Add to basket)[cite: 9]. Səbət bölməsində <em>Add to another address</em> düyməsinə kliklədim[cite: 9]. Səhifənin URL ünvanında <code>redirect_url</code> parametrinin işləndiyini müşahidə etdim[cite: 9]:</p>
+        <div class="terminal">http://nahamstore.thm/account/addressbook?redirect_url=...</div>
+
+        <p style="margin-top:10px;"><strong>Addım 2: Payload-un Tətbiqi və Yönləndirmə</strong></p>
+        <p>URL-dəki <code>redirect_url</code> parametrinin qiymətini xarici URL ilə dəyişdirdim[cite: 9]:</p>
+        <div class="terminal">http://nahamstore.thm/account/addressbook?redirect_url=http://www.google.com/</div>
+        <p>Ünvan məlumatlarını doldurub "Add Address" düyməsini sıxdıqda tətbiq ünvanı yadda saxladı və dərhal təyin etdiyim <code>google.com</code> ünvanına yönləndirdi[cite: 9].</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-shield-cat"></i> 4. Potensial Risk və Təsir (Impact)</div>
+        <ul>
+            <li><strong>Sosial Mühəndislik (Phishing):</strong> Hücumçular rəsmi domendən istifadə edərək etibarlı görünən linklər hazırlayır və istifadəçiləri saxta daxilolma (login) səhifələrinə yönləndirərək şifrələrini ələ keçirirlər[cite: 9].</li>
+            <li><strong>OAuth Token Sızması:</strong> Tətbiq OAuth protokolu istifadə edirsə, bu zəiflik vasitəsilə avtorizasiya kodları kənar serverlərə sızdırıla bilər[cite: 9].</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-lock"></i> 5. Təhlükəsizlik Tövsiyələri (Remediation)</div>
+        <ul>
+            <li><strong>Nisbi URL (Relative Path) İstifadəsini Məcbur Etmək:</strong> Yönləndirmə parametrlərində yalnız daxili yollara (məsələn, <code>/account/addressbook</code>) icazə verilməli, <code>http://</code> və ya <code>https://</code> ilə başlayan xarici ünvanlar bloklanmalıdır[cite: 9].</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
